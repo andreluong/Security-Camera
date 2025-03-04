@@ -9,5 +9,5 @@ target_link_libraries(server PRIVATE hal websocketpp opencv)
 add_custom_command(TARGET server POST_BUILD 
   COMMAND "${CMAKE_COMMAND}" -E copy 
      "$<TARGET_FILE:server>"
-     "~/cmpt433/public/project" 
+     "~/cmpt433/public/server" 
   COMMENT "Copying ARM executable to public NFS directory")
