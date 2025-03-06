@@ -8,10 +8,30 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #f3f3f3;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  .gradient-text {
+    background: linear-gradient(90deg, #7f22fe 0%, #ad46ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .gradient-background {
+    background: linear-gradient(90deg, #7f22fe 0%, #ad46ff 100%);
+  }
+
+  .hover-shadow {
+    @apply transition ease-in-out hover:shadow-md
+  }  
+
+  .hover-shadow-lg {
+    @apply transition ease-in-out hover:shadow-lg
+  }  
 }
