@@ -12,6 +12,8 @@ include(FetchContent)
 # What folders to build
 add_subdirectory(hal)  
 add_subdirectory(app)
+add_subdirectory(lcd)
+add_subdirectory(lgpio)
 
 # OpenCV
 set(OpenCV_DIR "/usr/aarch64-linux-gnu/lib/cmake/opencv4")
