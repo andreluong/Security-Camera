@@ -27,8 +27,6 @@ void captureAndSend(BroadcastServer& broadcastServer) {
 
 int main() {
     BroadcastServer broadcastServer;
-    int i2c_file_desc = i2cOperations::init_i2c_bus(I2CDRV_LINUX_BUS, I2C_DEVICE_ADDRESS);
-    close(i2c_file_desc);
 
     std::thread serverThread([&]() {
         broadcastServer.run(9002);
