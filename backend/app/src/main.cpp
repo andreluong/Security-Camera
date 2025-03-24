@@ -3,15 +3,17 @@
 #include <thread>
 #include "broadcastServer.h"
 #include "i2cHelpers.h"
+#include "lightSensor.h"
 
 #define USB_CAMERA_PORT 3
 #define CAMERA_DELAY_MS 30
+
 
 // Captures current frame and sends to all connections
 void captureAndSend(BroadcastServer& broadcastServer) {
     cv::VideoCapture capture(USB_CAMERA_PORT);
     if (!capture.isOpened()) {
-        std::cerr << "Error: Could not open camera\n";
+        std::cerr << "Error: Could not open camera!\n";
         return;
     }
 
@@ -27,17 +29,24 @@ void captureAndSend(BroadcastServer& broadcastServer) {
 
 int main() {
     BroadcastServer broadcastServer;
+    LightSensor sensor;
 
     std::thread serverThread([&]() {
         broadcastServer.run(9002);
     });
 
-    std::thread cameraThread([&]() {
-        captureAndSend(broadcastServer);
+    // std::thread cameraThread([&]() {
+    //     captureAndSend(broadcastServer);
+    // });
+
+    std::thread sensorThread([&]() {
+        sensor.getSamples();
     });
 
+    sensorThread.join();
     serverThread.join();
-    cameraThread.join();
+    // cameraThread.join();
+
     
     return 0;
 }
