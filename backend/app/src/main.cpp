@@ -41,21 +41,24 @@ void captureAndSend(BroadcastServer& broadcastServer) {
             std::cerr << "Forward pass failed\n";
         }
 
-        std::cout << "detections shape: " << detections.size << std::endl;
         for (int i = 0; i < detections.size[2]; i++) {
 
-            int idx[4] = {0,0,i,2};
-            float confidence = detections.at<float>(idx);
+            int idxConfidence[4] = {0,0,i,2};
+            float confidence = detections.at<float>(idxConfidence);
 
-            int l[4] = {0,0,i,3};
-            int t[4] = {0,0,i,4};
-            int r[4] = {0,0,i,5};
-            int b[4] = {0,0,i,6};
-            if (confidence > 0.2) {
-                int left = static_cast<int>(detections.at<float>(l) * frame.cols);
-                int top = static_cast<int>(detections.at<float>(t) * frame.rows);
-                int right = static_cast<int>(detections.at<float>(r) * frame.cols);
-                int bottom = static_cast<int>(detections.at<float>(b) * frame.rows);
+            int idxClass[4] = {0,0,i,1};
+            int classId = detections.at<float>(idxClass);
+
+            int idxLeft[4] = {0,0,i,3};
+            int idxTop[4] = {0,0,i,4};
+            int idxRight[4] = {0,0,i,5};
+            int idxBottom[4] = {0,0,i,6};
+
+            if (confidence > 0.2 && classId == 15) {
+                int left = static_cast<int>(detections.at<float>(idxLeft) * frame.cols);
+                int top = static_cast<int>(detections.at<float>(idxTop) * frame.rows);
+                int right = static_cast<int>(detections.at<float>(idxRight) * frame.cols);
+                int bottom = static_cast<int>(detections.at<float>(idxBottom) * frame.rows);
 
                 // Draw the bounding box
                 cv::rectangle(frame, cv::Point(left, top), cv::Point(right, bottom), cv::Scalar(0, 255, 0), 2);
