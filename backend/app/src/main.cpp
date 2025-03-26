@@ -29,39 +29,42 @@ void captureAndSend(BroadcastServer& broadcastServer) {
 
     while (true) {
         capture >> frame;
-        // cv::rectangle(frame, cv::Point(30, 30), cv::Point(50, 50), cv::Scalar(0, 0, 255), 3);
         if (frame.empty()) break;
-
+        
         // Prepare input for the model
         cv::Mat blob = cv::dnn::blobFromImage(frame, 0.007843, cv::Size(300, 300), cv::Scalar(127.5, 127.5, 127.5), true, false);
         net.setInput(blob);
 
         // Perform forward pass
         cv::Mat detections = net.forward();
-
-        // Parse results
-        cv::Mat detectionMat(detections.size[2], detections.size[3], CV_32F, detections.ptr<float>());
-        
-        
-        for (int i = 0; i < detectionMat.rows; i++) {
-            // float confidence = detectionMat.at<float>(i, 2);
-
-            // // if (confidence == 0) {  // Confidence threshold
-            // //     continue;
-            // // }
-            int objectClass = (int)detectionMat.at<float>(i, 1);
-            if (objectClass == 0) {  // Person class
-                int xLeftBottom = static_cast<int>(detectionMat.at<float>(i, 3) * frame.cols);
-                int yLeftBottom = static_cast<int>(detectionMat.at<float>(i, 4) * frame.rows);
-                int xRightTop = static_cast<int>(detectionMat.at<float>(i, 5) * frame.cols);
-                int yRightTop = static_cast<int>(detectionMat.at<float>(i, 6) * frame.rows);
-
-                // Draw bounding box
-                cv::rectangle(frame, cv::Point(xLeftBottom, yLeftBottom), cv::Point(xRightTop, yRightTop), cv::Scalar(0, 255, 0), 2);
-                cv::putText(frame, "Person", cv::Point(xLeftBottom, yLeftBottom - 5), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
-            }
+        if(detections.empty()) {
+            std::cerr << "Forward pass failed\n";
         }
 
+        std::cout << "detections shape: " << detections.size << std::endl;
+        for (int i = 0; i < detections.size[2]; i++) {
+
+            int idx[4] = {0,0,i,2};
+            float confidence = detections.at<float>(idx);
+
+            int l[4] = {0,0,i,3};
+            int t[4] = {0,0,i,4};
+            int r[4] = {0,0,i,5};
+            int b[4] = {0,0,i,6};
+            if (confidence > 0.2) {
+                int left = static_cast<int>(detections.at<float>(l) * frame.cols);
+                int top = static_cast<int>(detections.at<float>(t) * frame.rows);
+                int right = static_cast<int>(detections.at<float>(r) * frame.cols);
+                int bottom = static_cast<int>(detections.at<float>(b) * frame.rows);
+
+                // Draw the bounding box
+                cv::rectangle(frame, cv::Point(left, top), cv::Point(right, bottom), cv::Scalar(0, 255, 0), 2);
+
+                // Put the label text
+                std::string label =  "Person: " + std::to_string(confidence);
+                cv::putText(frame, label, cv::Point(left, top - 5), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
+            }
+        }
         broadcastServer.sendFrame(frame);
         std::this_thread::sleep_for(std::chrono::milliseconds(CAMERA_DELAY_MS));
     }
