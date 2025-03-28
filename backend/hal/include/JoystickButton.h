@@ -15,18 +15,17 @@ public:
     bool isPressed();
 
 private:
-    void listenerLoop();
-    long getCurrentTimeMs() const;
-
+    const char* chipPath;
+    unsigned int lineNumber;
     std::atomic<bool> running;
     std::atomic<bool> pressed;
+
+    void listenerLoop();
+    long getCurrentTimeMs() const;    
 
     std::thread listenerThread;
     struct gpiod_chip* chip = nullptr;
     struct gpiod_line* buttonLine = nullptr;
-
-    const char* chipPath;
-    unsigned int lineNumber;
 };
 
 #endif // JOYSTICK_BUTTON_H

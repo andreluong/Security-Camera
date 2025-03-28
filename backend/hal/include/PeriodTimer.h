@@ -37,12 +37,12 @@ private:
         long long prevTimestampInNs = 0;
     };
 
+    bool initialized;
+    std::vector<TimestampData> eventData_;
+    std::mutex mutex_;
+
     void updateStats(const TimestampData& data, PeriodStatistics& stats);
     long long getTimeInNanoS();
-
-    std::mutex mutex_;
-    std::vector<TimestampData> eventData_;
-    bool initialized;
 };
 
 #endif // PERIOD_TIMER_HPP
