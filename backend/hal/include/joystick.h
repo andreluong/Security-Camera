@@ -32,15 +32,15 @@ public:
     JoystickDirection getYDirection();
 
 private:
+    bool is_initialized;
+    int i2c_file_desc;
+
     int getX();
     int getY();
     void sleepForMs(long long delayInMs);
     void writeReg(uint8_t reg_addr, uint16_t value);
     uint16_t readReg(uint8_t reg_addr);
     uint16_t swapAndScale(uint16_t value);
-
-    int i2c_file_desc;
-    bool is_initialized;
 
     // Constants
     static constexpr const char* I2C_BUS = "/dev/i2c-1";
