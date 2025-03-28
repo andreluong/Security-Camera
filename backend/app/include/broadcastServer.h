@@ -1,3 +1,5 @@
+#ifndef BROADCAST_SERVER_H
+#define BROADCAST_SERVER_H
 #define ASIO_STANDALONE
 #define WEBSOCKETPP_CPP11_STL
 
@@ -26,3 +28,5 @@ private:
     server wsServer;
     connList wsConnections;
 };
+
+#endif

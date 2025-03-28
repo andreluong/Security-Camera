@@ -4,13 +4,22 @@
 #include <thread>
 #include <mutex>
 #include <deque>
-
+#include "personDetector.h"
+#include "broadcastServer.h"
 
 class CameraFeed {
     public:
-        CameraFeed(std::deque<cv::Mat>* frames);
+        CameraFeed();
+        CameraFeed(PersonDetector pd);
         ~CameraFeed() = default;
-        void queueFrame();
+        void captureAndQueueFrame();
+        void dequeAndSendFrame(BroadcastServer& broadcastServer);
+        void captureAndSend();
     private:
-        std::deque<cv::Mat>* frameQueue;
+        std::deque<cv::Mat> frameQueue;
+        std::mutex frameMutex;
+        bool isRunning;
+        PersonDetector personDetector;
+
+        
 };

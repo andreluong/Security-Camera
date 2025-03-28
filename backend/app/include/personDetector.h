@@ -1,3 +1,6 @@
+#ifndef PERSON_DETECTOR_H
+#define PERSON_DETECTOR_H
+
 #include <opencv2/opencv.hpp>
 #include <opencv2/dnn.hpp>
 #include <iostream>
@@ -16,9 +19,12 @@ class PersonDetector {
         PersonDetector(std::deque<cv::Mat>* frames);
         ~PersonDetector() = default;
         int getPeopleDetected();
+        void detectPeopleInFrame();
         cv::Mat detectPeopleInFrame(cv::Mat cameraFrame);
     private:
         int detectedPeople;
         cv::dnn::Net net;
         std::deque<cv::Mat>* frames;
 };
+
+#endif

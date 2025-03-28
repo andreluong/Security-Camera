@@ -6,6 +6,7 @@
 #include "personDetector.h"
 #include "i2cHelpers.h"
 #include "lightSensor.h"
+#include "cameraFeed.h"
 
 #include "Microservo.h"
 #include "PanTiltKit.h"
@@ -60,22 +61,28 @@ void testPanTiltKit() {
 
 int main() {
     BroadcastServer broadcastServer;
+    PersonDetector personDetector;
+    CameraFeed cameraFeed(personDetector);
      
     std::thread serverThread([&]() {
         broadcastServer.run(9002);
     });
 
-    std::thread cameraThread([&]() {
-        captureAndSend(broadcastServer);
-    });
-
-    // std::thread sensorThread([&]() {
-    //     sensor.getSamples();
+    // std::thread cameraThread([&]() {
+    //     captureAndSend(broadcastServer);
     // });
 
-    // sensorThread.join();
+    std::thread cameraFeedThread([&]() {
+        cameraFeed.captureAndQueueFrame();
+    });
 
-    cameraThread.join();
+    std::thread cameraSendThread([&]() {
+        cameraFeed.dequeAndSendFrame(broadcastServer);
+    });
+
+
+    cameraFeedThread.join();
+    cameraSendThread.join();
     serverThread.join();
 
     
