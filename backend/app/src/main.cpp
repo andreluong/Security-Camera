@@ -7,7 +7,7 @@
 #include "i2cHelpers.h"
 #include "lightSensor.h"
 #include "cameraFeed.h"
-
+#include "CommandServer.h"
 #include "Microservo.h"
 #include "PanTiltKit.h"
 #include <memory>
@@ -42,35 +42,22 @@ void captureAndSend(BroadcastServer& broadcastServer) {
     }
 }
 
-// TODO: Remove after integration
-void testPanTiltKit() {
-    std::cout << "Starting\n";
-
-    auto pan = std::make_unique<Microservo>("/dev/hat/pwm/GPIO6/", 0, 180);
-    auto tilt = std::make_unique<Microservo>("/dev/hat/pwm/GPIO14/", 0, 90);
-    PanTiltKit panTiltKit(std::move(pan), std::move(tilt));
-
-    panTiltKit.increasePanAngle(180);
-    panTiltKit.increaseTiltAngle(90);
-
-    panTiltKit.decreasePanAngle(180);
-    panTiltKit.decreaseTiltAngle(90);
-
-    std::cout << "Done\n";
-}
-
 int main() {
+    std::cout << "Starting server\n";
+
     BroadcastServer broadcastServer;
     PersonDetector personDetector;
     CameraFeed cameraFeed(personDetector);
      
-    std::thread serverThread([&]() {
+    auto pan = std::make_unique<Microservo>("/dev/hat/pwm/GPIO6/", 10, 0, 180);
+    auto tilt = std::make_unique<Microservo>("/dev/hat/pwm/GPIO14/", 30, 0, 90);
+    PanTiltKit panTiltKit(std::move(pan), std::move(tilt));
+
+    CommandServer commandServer = CommandServer(panTiltKit, personDetector);
+
+    std::thread broadcastThread([&]() {
         broadcastServer.run(9002);
     });
-
-    // std::thread cameraThread([&]() {
-    //     captureAndSend(broadcastServer);
-    // });
 
     std::thread cameraFeedThread([&]() {
         cameraFeed.captureAndQueueFrame();
@@ -80,11 +67,16 @@ int main() {
         cameraFeed.dequeAndSendFrame(broadcastServer);
     });
 
+    std::thread commandThread([&]() {
+        commandServer.run(9001);
+    });
 
-    cameraFeedThread.join();
+    commandThread.join();
     cameraSendThread.join();
-    serverThread.join();
+    cameraFeedThread.join();   
+    broadcastThread.join();
 
-    
+    std::cout << "Closing server\n";
+
     return 0;
 }

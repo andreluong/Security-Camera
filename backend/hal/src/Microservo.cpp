@@ -11,12 +11,11 @@ constexpr int ONE_SECOND_MS = 1000000000;
 constexpr int MIN_DUTY_CYCLE = 500000; // 0.5ms pulse width
 constexpr int MAX_DUTY_CYCLE = 2500000; // 2.5ms pulse width
 constexpr int MAX_ROTATION = 180;
-constexpr int SPEED = 10;
 
-Microservo::Microservo(const std::string& filePath, const int& minAngle, const int& maxAngle)
+Microservo::Microservo(const std::string& filePath, const int& period, const int& minAngle, const int& maxAngle)
     : filePath(filePath), minAngle(minAngle), maxAngle(maxAngle), curAngle(0) {
     setDutyCycle(0);
-    setPeriod(SPEED); 
+    setPeriod(period); 
     setEnable(1);
 
     setServoAngle(curAngle);

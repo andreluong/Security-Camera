@@ -6,7 +6,7 @@
 
 class Microservo {
 public:
-    Microservo(const std::string& filePath, const int& minAngle, const int& maxAngle);
+    Microservo(const std::string& filePath, const int& period, const int& minAngle, const int& maxAngle);
     ~Microservo();
 
     void setServoAngle(const int& angle);
