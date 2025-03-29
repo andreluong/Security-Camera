@@ -41,13 +41,14 @@ function App() {
       <div className='flex flex-row m-auto hover-shadow'>
         {/* Video Player */}
         <div className='flex flex-col'>
-          {hasVideo ? (
+          {/* {hasVideo ? (
             <img className='border-4 border-black w-[1280px] h-[720px] object-cover' ref={videoRef} alt="Video Feed" />
           ) : (
             <div className='border-4 bg-white border-black w-[1280px] h-[720px] flex items-center justify-center'>
               <p className='text-2xl text-center text-black'>Loading...</p>
             </div>
-          )}
+          )} */}
+          <img className='border-4 border-black w-[1280px] h-[720px] object-cover' ref={videoRef} alt="Video Feed" />
           <ControlBar />
         </div>
 

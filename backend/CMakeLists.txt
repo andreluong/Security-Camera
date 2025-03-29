@@ -3,6 +3,8 @@ project(Server VERSION 1.0 DESCRIPTION "Security Camera Server")
 
 set(CMAKE_CXX_STANDARD 17) # NOTE: Errors with C++20 with websocket++
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_INSTALL_RPATH "/opencv-lib/lib")
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 
 add_compile_options(-Wall -Werror -Wpedantic -Wextra -D_POSIX_C_SOURCE=200809L -g)
 add_compile_options(-fdiagnostics-color)
@@ -12,6 +14,8 @@ include(FetchContent)
 # What folders to build
 add_subdirectory(hal)  
 add_subdirectory(app)
+add_subdirectory(lcd)
+add_subdirectory(lgpio)
 
 # OpenCV
 set(OpenCV_DIR "/usr/aarch64-linux-gnu/lib/cmake/opencv4")
