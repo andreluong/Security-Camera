@@ -1,36 +1,13 @@
-import { useRef, useEffect, useState } from 'react'
 import './App.css'
 import ControlBar from './components/ControlBar';
 import Navbar from './components/Navbar';
 import Snapshots from './components/Snapshots';
-
-const SERVER = "ws://192.168.7.2:9002";
+import { useCameraSocket } from './hooks/useCameraSocket';
+import { useCommandSocket } from './hooks/useCommandSocket';
 
 function App() {
-  const videoRef = useRef<HTMLImageElement>(null);
-  const [hasVideo, setHasVideo] = useState(false);
-  const [numPeople, setNumPeople] = useState(0);
-
-  useEffect(() => {
-    const websocket = new WebSocket(SERVER);
-    websocket.binaryType = "arraybuffer";
-
-    websocket.onmessage = (event) => {
-      const blob = new Blob([event.data], { type: "image/jpeg" });
-      const url = URL.createObjectURL(blob);
-      
-      if (videoRef.current) {
-        videoRef.current.src = url;
-        setHasVideo(true);
-      } else {
-        setHasVideo(false);
-      }
-    };
-
-    return () => {
-      websocket.close();
-    };
-  }, []);
+  const { videoRef, hasVideo } = useCameraSocket();
+  const { peopleCount, sendCommand } = useCommandSocket();
 
   return (
     <div className='flex flex-col h-screen'>
@@ -49,7 +26,7 @@ function App() {
             </div>
           )} */}
           <img className='border-4 border-black w-[1280px] h-[720px] object-cover' ref={videoRef} alt="Video Feed" />
-          <ControlBar />
+          <ControlBar sendCommand={sendCommand} />
         </div>
 
         {/* Sidebar */}
@@ -57,7 +34,7 @@ function App() {
           {/* Stats */}
           <div className='p-4 border-b-4 border-black'>
             <h2 className='mb-2 text-xl font-semibold'>Stats</h2>
-            <p>People: {numPeople}</p>
+            <p>People: {peopleCount}</p>
             <p>Runtime: 00:21:29</p>
           </div>
 

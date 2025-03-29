@@ -3,7 +3,7 @@
 #include "Microservo.h"
 #include <memory>
 
-constexpr int ANGLE_STEP = 5;
+constexpr int ANGLE_STEP = 10;
 
 class PanTiltKit {
 public:
