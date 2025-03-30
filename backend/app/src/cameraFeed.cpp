@@ -3,14 +3,14 @@
 #include <thread>
 
 #define USB_CAMERA_PORT 3
-#define CAMERA_DELAY_MS 30
+#define CAMERA_DELAY_MS 10
 
 CameraFeed::CameraFeed(PersonDetector pd) {
     isRunning = true;
     personDetector = pd;
 }
 
-void CameraFeed::captureAndQueueFrame() {
+void CameraFeed::captureFrame() {
     // Open camera
     cv::VideoCapture capture(USB_CAMERA_PORT);
     if (!capture.isOpened()) {
@@ -28,10 +28,15 @@ void CameraFeed::captureAndQueueFrame() {
         frameQueue.push_front(frame);
         frameMutex.unlock();
     }
+    capture.release();
+}
+
+void CameraFeed::stopCamera() {
+    isRunning = false;
 }
 
 
-void CameraFeed::dequeAndSendFrame(BroadcastServer& broadcastServer) {
+void CameraFeed::sendFrame(BroadcastServer& broadcastServer) {
     while(isRunning) {
         if(!frameQueue.empty()) {
             cv::Mat frame = frameQueue.back();
@@ -41,7 +46,7 @@ void CameraFeed::dequeAndSendFrame(BroadcastServer& broadcastServer) {
             frameMutex.unlock();
     
             frame = personDetector.detectPeopleInFrame(frame);
-            
+            std::cout << "Detected persons: " << personDetector.getPeopleDetected() << std::endl;
             //broadcast to server?
             broadcastServer.sendFrame(frame);
         }

@@ -12,8 +12,9 @@ class CameraFeed {
         CameraFeed();
         CameraFeed(PersonDetector pd);
         ~CameraFeed() = default;
-        void captureAndQueueFrame();
-        void dequeAndSendFrame(BroadcastServer& broadcastServer);
+        void captureFrame();
+        void stopCamera();
+        void sendFrame(BroadcastServer& broadcastServer);
         void captureAndSend();
     private:
         std::deque<cv::Mat> frameQueue;

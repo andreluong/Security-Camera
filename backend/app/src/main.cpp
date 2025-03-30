@@ -73,16 +73,16 @@ int main() {
     // });
 
     std::thread cameraFeedThread([&]() {
-        cameraFeed.captureAndQueueFrame();
+        cameraFeed.captureFrame();
     });
 
     std::thread cameraSendThread([&]() {
-        cameraFeed.dequeAndSendFrame(broadcastServer);
+        cameraFeed.sendFrame(broadcastServer);
     });
 
 
-    cameraFeedThread.join();
     cameraSendThread.join();
+    cameraFeedThread.join();
     serverThread.join();
 
     
