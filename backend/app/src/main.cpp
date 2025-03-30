@@ -18,30 +18,6 @@
 const std::string modelWeights = "models/MobileNetSSD.caffemodel";
 const std::string modelConfig = "models/MobileNetSSD.prototxt";
 
-
-// Captures current frame and sends to all connections
-void captureAndSend(BroadcastServer& broadcastServer) {
-    cv::VideoCapture capture(USB_CAMERA_PORT);
-    PersonDetector detector;
-    if (!capture.isOpened()) {
-        std::cerr << "Error: Could not open camera!\n";
-        return;
-    }
-
-    cv::Mat frame;
-
-    while (true) {
-        capture >> frame;
-        if (frame.empty()) break;
-        
-        frame = detector.detectPeopleInFrame(frame);
-        std::cout << detector.getPeopleDetected() << std::endl;
-
-        broadcastServer.sendFrame(frame);
-        std::this_thread::sleep_for(std::chrono::milliseconds(CAMERA_DELAY_MS));
-    }
-}
-
 int main() {
     std::cout << "Starting server\n";
 
