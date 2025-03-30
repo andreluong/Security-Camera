@@ -29,7 +29,7 @@ void Microservo::setServoAngle(const int& angle) {
     curAngle = std::clamp(angle, minAngle, maxAngle);
     int dutyCycle = MIN_DUTY_CYCLE + ((MAX_DUTY_CYCLE - MIN_DUTY_CYCLE) * curAngle) / MAX_ROTATION;
     setDutyCycle(dutyCycle);
-    sleep(2); // Give time to process
+    sleep(1); // Give time to process
 }
 
 void Microservo::increaseAngle(const int& angle) {
