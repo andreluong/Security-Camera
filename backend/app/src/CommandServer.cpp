@@ -23,26 +23,26 @@ CommandServer::CommandServer(PanTiltKit& kit, PersonDetector& detector) : panTil
 }
 
 void CommandServer::onOpen(const websocketpp::connection_hdl& hdl) {
-    std::cout << "Client connected to Command Server.\n";
+    std::cout << hdl.lock().get() << " connected to Command Server.\n";
     wsConnections.insert(hdl);
 }
 
 void CommandServer::onClose(const websocketpp::connection_hdl& hdl) {
-    std::cout << "Client disconnected from Command Server.\n";
+    std::cout << hdl.lock().get() << " disconnected from Command Server.\n";
     wsConnections.erase(hdl);
 }
 
 // Callback to listen and respond to commands
 void CommandServer::onMessage(const websocketpp::connection_hdl& hdl, const server::message_ptr& msg) {
     // All valid commands
-    std::unordered_map<std::string_view, std::function<void()>> commandMap{
-        {"count", [&] { getPeopleCount(hdl, msg); }},
-        {"left", [&] { panTiltKit.increasePanAngle(); }},
-        {"right", [&] { panTiltKit.decreasePanAngle(); }},
-        {"up", [&] { panTiltKit.increaseTiltAngle(); }},
-        {"down", [&] { panTiltKit.decreaseTiltAngle(); }},
-        {"alarm", [&] { /* Alarm */ }},
-        {"stop", [&] { /* Terminate */ }}
+    std::unordered_map<std::string, std::function<void()>> commandMap{
+        {"count", [this, &hdl, &msg] { sendPeopleCount(hdl, msg); }},
+        {"left", [this] { panTiltKit.increasePanAngle(); }},
+        {"right", [this] { panTiltKit.decreasePanAngle(); }},
+        {"up", [this] { panTiltKit.increaseTiltAngle(); }},
+        {"down", [this] { panTiltKit.decreaseTiltAngle(); }},
+        {"alarm", [] { /* Alarm */ }},
+        {"stop", [this, &hdl] { terminate(hdl); }}
     };
 
     auto payload = msg->get_payload();
@@ -63,9 +63,17 @@ void CommandServer::run(const uint16_t& port) {
     wsServer.run();
 }
 
-void CommandServer::getPeopleCount(const websocketpp::connection_hdl& hdl, const server::message_ptr& msg) {
+// TODO: Only disconnects client. Should close terminate program
+// [2025-03-29 02:02:03] [disconnect] Disconnect close local:[1000,client exit] remote:[1000,client exit]
+void CommandServer::terminate(const websocketpp::connection_hdl& hdl) {
+    wsServer.close(hdl, websocketpp::close::status::normal, "client exit");
+}
+
+void CommandServer::sendPeopleCount(const websocketpp::connection_hdl& hdl, const server::message_ptr& msg) {
     try {
-        wsServer.send(hdl, std::to_string(personDetector.getPeopleDetected()), msg->get_opcode());
+        const std::string payload = "count: " + std::to_string(personDetector.getPeopleDetected());
+        wsServer.send(hdl, payload, msg->get_opcode());
+        std::cout << "Sent " << payload << std::endl;
     } catch (websocketpp::exception const & e) {
         std::cerr << "Echo failed because: " << "(" << e.what() << ")" << std::endl;
     }

@@ -5,10 +5,8 @@
 #define USB_CAMERA_PORT 3
 #define CAMERA_DELAY_MS 30
 
-CameraFeed::CameraFeed(PersonDetector pd) {
-    isRunning = true;
-    personDetector = pd;
-}
+CameraFeed::CameraFeed(PersonDetector& pd)
+    : isRunning(true), personDetector(pd) {}
 
 void CameraFeed::captureAndQueueFrame() {
     // Open camera
@@ -29,7 +27,6 @@ void CameraFeed::captureAndQueueFrame() {
         frameMutex.unlock();
     }
 }
-
 
 void CameraFeed::dequeAndSendFrame(BroadcastServer& broadcastServer) {
     while(isRunning) {
