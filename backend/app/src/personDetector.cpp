@@ -9,12 +9,11 @@ PersonDetector::PersonDetector() {
     if (net.empty()) {
         std::cerr << "Error loading model." << std::endl;
     }
-
-    detectedPeople = 0;
+    detectedPeople.store(0, std::memory_order_relaxed);
 }
 
 int PersonDetector::getPeopleDetected() {
-    return detectedPeople;
+    return detectedPeople.load(std::memory_order_relaxed);
 }
 
 cv::Mat PersonDetector::detectPeopleInFrame(cv::Mat cameraFrame) {
@@ -58,7 +57,7 @@ cv::Mat PersonDetector::detectPeopleInFrame(cv::Mat cameraFrame) {
             detected++;
         }
     }
-    detectedPeople = detected;
+    detectedPeople.store(detected, std::memory_order_relaxed);
 
     return frame;
 }

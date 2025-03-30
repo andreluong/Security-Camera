@@ -41,13 +41,16 @@ export function useCommandSocket() {
 
     websocket.onmessage = (event) => {
       try {
-        const messageData = JSON.parse(event.data);
+        const commandResponse: string = event.data;
 
-        // TODO: Identify commands and message
+        if (commandResponse.startsWith("count")) {
+          const countString = commandResponse.split(":")[1].trim();
+          setPeopleCount(parseInt(countString));
 
-        console.log(messageData);
-      
-        setPeopleCount(peopleCount + 1);
+        // TODO: Snapshot
+        } else if (commandResponse.startsWith("snapshot")) {
+          
+        }
       } catch (error) {
         console.error("Invalid JSON received:", event.data);
       }
@@ -57,6 +60,15 @@ export function useCommandSocket() {
       websocket.close();
     };
   }, []);
+
+  // Send count command every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      sendCommand("count");
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [sendCommand]);
 
   return { peopleCount, sendCommand };
 }

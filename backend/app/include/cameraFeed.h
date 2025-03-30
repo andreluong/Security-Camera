@@ -10,7 +10,7 @@
 class CameraFeed {
     public:
         CameraFeed();
-        CameraFeed(PersonDetector pd);
+        CameraFeed(PersonDetector& pd);
         ~CameraFeed() = default;
         void captureAndQueueFrame();
         void dequeAndSendFrame(BroadcastServer& broadcastServer);
@@ -19,7 +19,7 @@ class CameraFeed {
         std::deque<cv::Mat> frameQueue;
         std::mutex frameMutex;
         bool isRunning;
-        PersonDetector personDetector;
+        PersonDetector& personDetector;
 
         
 };

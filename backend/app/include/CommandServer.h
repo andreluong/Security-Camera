@@ -42,5 +42,6 @@ private:
     server wsServer;
     connList wsConnections;
 
-    void getPeopleCount(const websocketpp::connection_hdl& hdl, const server::message_ptr& msg);
+    void terminate(const websocketpp::connection_hdl& hdl);
+    void sendPeopleCount(const websocketpp::connection_hdl& hdl, const server::message_ptr& msg);
 };

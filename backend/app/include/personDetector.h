@@ -7,11 +7,11 @@
 #include <thread>
 #include <mutex>
 #include <deque>
+#include <atomic>
 
 #define PERSON_ID 15
 #define MIN_CONFIDENCE 0.2
 #define SCALE_FACTOR 0.007843
-
 
 class PersonDetector {
     public:
@@ -22,7 +22,7 @@ class PersonDetector {
         void detectPeopleInFrame();
         cv::Mat detectPeopleInFrame(cv::Mat cameraFrame);
     private:
-        int detectedPeople;
+        std::atomic<int> detectedPeople;
         cv::dnn::Net net;
         std::deque<cv::Mat>* frames;
 };
