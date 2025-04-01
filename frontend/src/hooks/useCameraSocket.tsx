@@ -12,7 +12,10 @@ export function useCameraSocket() {
 
     websocket.onopen = () => console.log("Camera WebSocket connected");
 
-    websocket.onclose = () => console.warn("Camera WebSocket closed");
+    websocket.onclose = () => {
+      console.warn("Camera WebSocket closed");
+      setHasVideo(false);
+    }
     
     websocket.onerror = (err) => console.error("Camera WebSocket error:", err);
 
@@ -28,9 +31,7 @@ export function useCameraSocket() {
       }
     };
 
-    return () => {
-      websocket.close();
-    };
+    return () => websocket.close();
   }, []);
 
   return { videoRef, hasVideo };
