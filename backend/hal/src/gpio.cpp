@@ -33,6 +33,7 @@ Gpio::~Gpio() {
         }
     }
     is_initialized = false;
+    std::printf("GPIO module shutdown.\n");
 }
 
 // Opening a pin gives us a "line" that we later work with.

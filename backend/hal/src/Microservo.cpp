@@ -1,6 +1,9 @@
 #include "Microservo.h"
 #include <iostream>
 #include <algorithm>
+#include <cstdio>
+#include <thread>
+#include <chrono>
 
 const std::string& PERIOD = "period";
 const std::string& DUTY_CYCLE = "duty_cycle";
@@ -23,13 +26,17 @@ Microservo::Microservo(const std::string& filePath, const int& period, const int
 
 Microservo::~Microservo() {
     setEnable(0);
+    std::printf("Microservo module shutdown.\n");
 }
 
 void Microservo::setServoAngle(const int& angle) {
     curAngle = std::clamp(angle, minAngle, maxAngle);
-    int dutyCycle = MIN_DUTY_CYCLE + ((MAX_DUTY_CYCLE - MIN_DUTY_CYCLE) * curAngle) / MAX_ROTATION;
-    setDutyCycle(dutyCycle);
-    sleep(1); // Give time to process
+    if (curAngle < maxAngle) {
+        // Bound angle to [MIN_DUTY_CYCLE, MAX_DUTY_CYCLE]
+        int dutyCycle = MIN_DUTY_CYCLE + ((MAX_DUTY_CYCLE - MIN_DUTY_CYCLE) * curAngle) / MAX_ROTATION;
+        setDutyCycle(dutyCycle);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
 }
 
 void Microservo::increaseAngle(const int& angle) {

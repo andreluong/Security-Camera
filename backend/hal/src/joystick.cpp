@@ -3,11 +3,11 @@
 #include "i2cHelpers.h"
 #include <chrono>
 #include <cassert>
+#include <pthread.h>
 
 // Construct joystick with thread
-// TODO: Inject pan/tilt kit
-Joystick::Joystick() : is_initialized(true), is_running(true), pressed(false), i2c_file_desc(0), 
-    joystickLine(GpioLine(JOYSTICK_GPIO_CHIP, JOYSTICK_LINE_NUM)) 
+Joystick::Joystick(PanTiltKit& kit) : is_initialized(true), is_running(true), pressed(false), i2c_file_desc(0), 
+    panTiltKit(kit), joystickLine(GpioLine(JOYSTICK_GPIO_CHIP, JOYSTICK_LINE_NUM)) 
 {
     i2c_file_desc = i2cOperations::init_i2c_bus(I2CDRV_LINUX_BUS, I2C_DEVICE_ADDRESS);
     
@@ -27,6 +27,7 @@ Joystick::Joystick() : is_initialized(true), is_running(true), pressed(false), i
 Joystick::~Joystick() {
     assert(is_initialized);
     is_running = false;
+    pthread_cancel(buttonThread.native_handle()); // Must be cancelled due to hanging
     if (joystickThread.joinable()) joystickThread.join();
     if (buttonThread.joinable()) buttonThread.join();
     close(i2c_file_desc);
@@ -42,18 +43,22 @@ void Joystick::processDirection() {
         auto direction = getDirection();
         switch (direction) {
             case JoystickDirection::UP: {
+                panTiltKit.increaseTiltAngle();
                 std::printf("Joystick Direction: UP\n");
                 break;
             }
             case JoystickDirection::DOWN: {
+                panTiltKit.decreaseTiltAngle();
                 std::printf("Joystick Direction: DOWN\n");
                 break;
             }
             case JoystickDirection::LEFT: {
+                panTiltKit.increasePanAngle();
                 std::printf("Joystick Direction: LEFT\n");
                 break;
             }
             case JoystickDirection::RIGHT: {
+                panTiltKit.decreasePanAngle();
                 std::printf("Joystick Direction: RIGHT\n");
                 break;
             }
@@ -63,7 +68,7 @@ void Joystick::processDirection() {
             }
             default: break;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
 
@@ -137,17 +142,18 @@ void Joystick::processButton() {
 
         for (int i = 0; i < numEvents; i++) {
             struct gpiod_line* line_handle = gpiod_line_bulk_get_line(&bulkEvents, i);
-
+            
             // Get line events
             struct gpiod_line_event event;
-            if (gpiod_line_event_read(line_handle, &event) == -1) {
-                perror("Line Event");
-                exit(EXIT_FAILURE);
+            if (gpiod_line_event_read(line_handle, &event) == 0) {
+                // Run the state machine
+                bool isRising = event.event_type == GPIOD_LINE_EVENT_RISING_EDGE;
+                processStateEvent(isRising, &currentState->rising, &currentState->falling);
+            } else {
+                perror("Line Event Read.\n");
+                break;
             }
-
-            // Run the state machine
-            bool isRising = event.event_type == GPIOD_LINE_EVENT_RISING_EDGE;
-            processStateEvent(isRising, &currentState->rising, &currentState->falling);
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }

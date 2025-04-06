@@ -13,6 +13,7 @@
 #include "gpio.h"
 #include <vector>
 #include <functional>
+#include "PanTiltKit.h"
 
 struct State;
 
@@ -40,7 +41,7 @@ enum class JoystickDirection {
 
 class Joystick {
 public:
-    Joystick();
+    Joystick(PanTiltKit& kit);
     ~Joystick();
 
 private:
@@ -48,6 +49,7 @@ private:
     std::atomic<bool> is_running;
     std::atomic<bool> pressed;
     int i2c_file_desc;
+    PanTiltKit& panTiltKit;
     GpioLine joystickLine;
     std::vector<State> states;
     State* currentState = nullptr;

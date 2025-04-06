@@ -20,25 +20,16 @@
 const std::string modelWeights = "models/MobileNetSSD.caffemodel";
 const std::string modelConfig = "models/MobileNetSSD.prototxt";
 
-void testJoystick() {
-    Gpio gpio;
-    Joystick joystick;
-    std::this_thread::sleep_for(std::chrono::seconds(8)); // Give some time to test
-}
-
 int main() {
     std::cout << "Starting server\n";
 
-    testJoystick();
-    return 0;
-
+    Gpio gpio;
     BroadcastServer broadcastServer;
     PersonDetector personDetector;
     CameraFeed cameraFeed(personDetector);
-     
-    auto pan = std::make_unique<Microservo>("/dev/hat/pwm/GPIO6/", 10, 0, 180);
-    auto tilt = std::make_unique<Microservo>("/dev/hat/pwm/GPIO14/", 30, 0, 90);
-    PanTiltKit panTiltKit(std::move(pan), std::move(tilt));
+
+    PanTiltKit panTiltKit;
+    Joystick joystick(panTiltKit);    
 
     CommandServer commandServer = CommandServer(panTiltKit, personDetector);
 
