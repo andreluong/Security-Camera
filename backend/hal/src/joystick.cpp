@@ -1,97 +1,79 @@
 #include "joystick.h"
 #include <cstdio>
+#include "i2cHelpers.h"
+#include <chrono>
+#include <cassert>
 
-Joystick::Joystick() : is_initialized(false), i2c_file_desc(0) {
-    init();
+// Construct joystick with thread
+// TODO: Inject pan/tilt kit
+Joystick::Joystick() : is_initialized(true), is_running(true), i2c_file_desc(0) {
+    i2c_file_desc = i2cOperations::init_i2c_bus(I2CDRV_LINUX_BUS, I2C_DEVICE_ADDRESS);
+    joystickThread = std::thread(&Joystick::processDirection, this);
 }
 
+// Terminate thread when object is destroyed
 Joystick::~Joystick() {
-    cleanup();
-}
-
-void Joystick::sleepForMs(long long delayInMs) {
-    const long long NS_PER_MS = 1000000;
-    const long long NS_PER_SECOND = 1000000000;
-    long long delayNs = delayInMs * NS_PER_MS;
-    int seconds = delayNs / NS_PER_SECOND;
-    int nanoseconds = delayNs % NS_PER_SECOND;
-    struct timespec reqDelay = {seconds, nanoseconds};
-    nanosleep(&reqDelay, nullptr);
-}
-
-void Joystick::init() {
-    i2c_file_desc = open(I2C_BUS, O_RDWR);
-    if (i2c_file_desc == -1) {
-        perror("Unable to open I2C bus");
-        exit(EXIT_FAILURE);
-    }
-    if (ioctl(i2c_file_desc, I2C_SLAVE, I2C_DEVICE_ADDRESS) == -1) {
-        perror("Unable to set I2C device to slave address");
-        exit(EXIT_FAILURE);
-    }
-    is_initialized = true;
-}
-
-void Joystick::cleanup() {
     assert(is_initialized);
+    is_running = false;
+    if (joystickThread.joinable()) joystickThread.join();
     close(i2c_file_desc);
     is_initialized = false;
+    printf("Joystick module shutdown.");
 }
 
-void Joystick::writeReg(uint8_t reg_addr, uint16_t value) {
-    uint8_t buffer[3];
-    buffer[0] = reg_addr;
-    buffer[1] = static_cast<uint8_t>(value & 0xFF);
-    buffer[2] = static_cast<uint8_t>((value & 0xFF00) >> 8);
-    if (write(i2c_file_desc, buffer, 3) != 3) {
-        perror("Unable to write I2C register");
-        exit(EXIT_FAILURE);
+// Changes servo angles based on direction
+// TODO: Add pan/tilt kit
+void Joystick::processDirection() {
+    while (is_running) {
+        auto direction = getDirection();
+        switch (direction) {
+            case JoystickDirection::UP: {
+                std::printf("Joystick Direction: UP\n");
+                break;
+            }
+            case JoystickDirection::DOWN: {
+                std::printf("Joystick Direction: DOWN\n");
+                break;
+            }
+            case JoystickDirection::LEFT: {
+                std::printf("Joystick Direction: LEFT\n");
+                break;
+            }
+            case JoystickDirection::RIGHT: {
+                std::printf("Joystick Direction: RIGHT\n");
+                break;
+            }
+            default: break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
-}
-
-uint16_t Joystick::readReg(uint8_t reg_addr) {
-    if (write(i2c_file_desc, &reg_addr, sizeof(reg_addr)) != sizeof(reg_addr)) {
-        perror("Unable to write I2C register.");
-        exit(EXIT_FAILURE);
-    }
-    uint16_t value = 0;
-    if (read(i2c_file_desc, &value, sizeof(value)) != sizeof(value)) {
-        perror("Unable to read I2C register");
-        exit(EXIT_FAILURE);
-    }
-    return value;
-}
-
-uint16_t Joystick::swapAndScale(uint16_t value) {
-    uint16_t swap = ((value & 0xFF00) >> 8) | ((value & 0x00FF) << 8);
-    return swap >> 4;
 }
 
 int Joystick::getX() {
-    assert(is_initialized);
-    writeReg(REG_CONFIGURATION, X_CHANNEL);
-    sleepForMs(5);
-    uint16_t raw_read = readReg(REG_DATA);
-    uint16_t scaled = swapAndScale(raw_read);
+    i2cOperations::write_i2c_reg16(i2c_file_desc, REG_CONFIGURATION, JOYSTICK_X);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    uint16_t raw_read = i2cOperations::read_i2c_reg16(i2c_file_desc, REG_DATA);
+    uint16_t scaled_read = i2cOperations::swap_and_scale(raw_read);
 
-    if (scaled >= maxThresh) return coordMax;
-    if (scaled <= minThresh) return coordMin;
+    if (scaled_read >= maxThresh) return coordMax;
+    if (scaled_read <= minThresh) return coordMin;
     return coordIdle;
 }
 
 int Joystick::getY() {
-    assert(is_initialized);
-    writeReg(REG_CONFIGURATION, Y_CHANNEL);
-    sleepForMs(5);
-    uint16_t raw_read = readReg(REG_DATA);
-    uint16_t scaled = swapAndScale(raw_read);
+    i2cOperations::write_i2c_reg16(i2c_file_desc, REG_CONFIGURATION, JOYSTICK_Y);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    uint16_t raw_read = i2cOperations::read_i2c_reg16(i2c_file_desc, REG_DATA);
+    uint16_t scaled_read = i2cOperations::swap_and_scale(raw_read);
 
-    if (scaled >= maxThresh) return coordMin;
-    if (scaled <= minThresh) return coordMax;
+    if (scaled_read >= maxThresh) return coordMin;
+    if (scaled_read <= minThresh) return coordMax;
     return coordIdle;
 }
 
 JoystickDirection Joystick::getDirection() {
+    assert(is_initialized);
+
     int xVal = getX();
     if (xVal == coordMax) return JoystickDirection::RIGHT;
     if (xVal == coordMin) return JoystickDirection::LEFT;
@@ -100,19 +82,5 @@ JoystickDirection Joystick::getDirection() {
     if (yVal == coordMax) return JoystickDirection::UP;
     if (yVal == coordMin) return JoystickDirection::DOWN;
 
-    return JoystickDirection::IDLE;
-}
-
-JoystickDirection Joystick::getXDirection() {
-    int xVal = getX();
-    if (xVal == coordMax) return JoystickDirection::RIGHT;
-    if (xVal == coordMin) return JoystickDirection::LEFT;
-    return JoystickDirection::IDLE;
-}
-
-JoystickDirection Joystick::getYDirection() {
-    int yVal = getY();
-    if (yVal == coordMax) return JoystickDirection::UP;
-    if (yVal == coordMin) return JoystickDirection::DOWN;
     return JoystickDirection::IDLE;
 }

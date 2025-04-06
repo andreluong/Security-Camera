@@ -11,12 +11,18 @@
 #include "Microservo.h"
 #include "PanTiltKit.h"
 #include <memory>
+#include "joystick.h"
 
 #define USB_CAMERA_PORT 3
 #define CAMERA_DELAY_MS 30
 
 const std::string modelWeights = "models/MobileNetSSD.caffemodel";
 const std::string modelConfig = "models/MobileNetSSD.prototxt";
+
+void testJoystick() {
+    Joystick joystick;
+    std::this_thread::sleep_for(std::chrono::seconds(5)); // Give some time to test
+}
 
 int main() {
     std::cout << "Starting server\n";

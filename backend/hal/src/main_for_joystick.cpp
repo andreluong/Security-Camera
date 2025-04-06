@@ -1,59 +1,61 @@
-#include "joystick.h"
-#include "JoystickButton.h"
-#include "PlaySound.h"
-#include <iostream>
-#include <thread>
-#include <chrono>
+// TODO: Currently refactoring. Will remove this file later
 
-int main() {
-    try {
-        Audio::init();
-        Sound Sound; 
-        Joystick joystick;
-        JoystickButton joystickBtn;
+// #include "joystick.h"
+// #include "JoystickButton.h"
+// #include "PlaySound.h"
+// #include <iostream>
+// #include <thread>
+// #include <chrono>
 
-        joystickBtn.startListening();
+// int main() {
+//     try {
+//         Audio::init();
+//         Sound Sound; 
+//         Joystick joystick;
+//         JoystickButton joystickBtn;
 
-        while (true) {
-            // uint16_t x = Joystick.readX();
-            // uint16_t y = Joystick.readY();
+//         joystickBtn.startListening();
 
-            // std::cout << "Joystick X: " << x << ", Y: " << y << " -> ";
-            bool pressed = joystickBtn.isPressed();
-            JoystickDirection dir = joystick.getDirection();
+//         while (true) {
+//             // uint16_t x = Joystick.readX();
+//             // uint16_t y = Joystick.readY();
 
-            switch (dir) {
-            case JoystickDirection::UP:
-                std::cout << "Joystick Direction: UP" << std::endl;
-                break;
-            case JoystickDirection::DOWN:
-                std::cout << "Joystick Direction: DOWN" << std::endl;
-                break;
-            case JoystickDirection::LEFT:
-                std::cout << "Joystick Direction: LEFT" << std::endl;
-                break;
-            case JoystickDirection::RIGHT:
-                std::cout << "Joystick Direction: RIGHT" << std::endl;
-                break;
-            case JoystickDirection::IDLE:
-                std::cout << "Joystick Direction: IDLE" << std::endl;
-                break;
-        }
+//             // std::cout << "Joystick X: " << x << ", Y: " << y << " -> ";
+//             bool pressed = joystickBtn.isPressed();
+//             JoystickDirection dir = joystick.getDirection();
+
+//             switch (dir) {
+//             case JoystickDirection::UP:
+//                 std::cout << "Joystick Direction: UP" << std::endl;
+//                 break;
+//             case JoystickDirection::DOWN:
+//                 std::cout << "Joystick Direction: DOWN" << std::endl;
+//                 break;
+//             case JoystickDirection::LEFT:
+//                 std::cout << "Joystick Direction: LEFT" << std::endl;
+//                 break;
+//             case JoystickDirection::RIGHT:
+//                 std::cout << "Joystick Direction: RIGHT" << std::endl;
+//                 break;
+//             case JoystickDirection::IDLE:
+//                 std::cout << "Joystick Direction: IDLE" << std::endl;
+//                 break;
+//         }
             
             
-        if (pressed) {
-            Sound.playSound();
-            std::cout << "Joystick is PRESSED!";
-        }
+//         if (pressed) {
+//             Sound.playSound();
+//             std::cout << "Joystick is PRESSED!";
+//         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
+//         std::this_thread::sleep_for(std::chrono::milliseconds(500));
+//         }
 
-        joystickBtn.stopListening(); // Optional cleanup (not required with detached thread)
-    } catch (...) {
-        std::cerr << "An error occurred while initializing the joystick or button." << std::endl;
-        return EXIT_FAILURE;
-    }
+//         joystickBtn.stopListening(); // Optional cleanup (not required with detached thread)
+//     } catch (...) {
+//         std::cerr << "An error occurred while initializing the joystick or button." << std::endl;
+//         return EXIT_FAILURE;
+//     }
 
-    return 0;
-}
+//     return 0;
+// }
