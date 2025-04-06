@@ -11,6 +11,7 @@
 #include "Microservo.h"
 #include "PanTiltKit.h"
 #include "PlaySound.h"
+#include "LCD_Display.h"
 #include <memory>
 
 #define USB_CAMERA_PORT 3
