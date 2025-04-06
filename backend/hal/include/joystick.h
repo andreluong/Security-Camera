@@ -2,59 +2,79 @@
 #define JOYSTICK_H
 
 #include <cstdint>
-#include <cassert>
 #include <cstdlib>
 #include <ctime>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <linux/i2c-dev.h>
+#include <atomic>
+#include <thread>
+#include "gpio.h"
+#include <vector>
+#include <functional>
+#include "PanTiltKit.h"
 
+struct State;
+
+struct StateEvent {
+    State* nextState = nullptr;
+    std::function<void()> action = nullptr;
+
+    StateEvent(State* next, std::function<void()> act) 
+        : nextState(std::move(next)), action(std::move(act)) {}
+};
+
+struct State {
+    StateEvent rising;
+    StateEvent falling;
+};
 
 enum class JoystickDirection {
     IDLE,
     UP,
     DOWN,
     LEFT,
-    RIGHT
+    RIGHT,
+    PRESSED
 };
 
 class Joystick {
 public:
-    Joystick();
+    Joystick(PanTiltKit& kit);
     ~Joystick();
 
-    void init();
-    void cleanup();
-
-    JoystickDirection getDirection();
-    JoystickDirection getXDirection();
-    JoystickDirection getYDirection();
-
 private:
-    bool is_initialized;
+    std::atomic<bool> is_initialized;
+    std::atomic<bool> is_running;
+    std::atomic<bool> pressed;
     int i2c_file_desc;
+    PanTiltKit& panTiltKit;
+    GpioLine joystickLine;
+    std::vector<State> states;
+    State* currentState = nullptr;
 
+    std::thread joystickThread;
+    std::thread buttonThread;
+
+    void processDirection(); // Thread
+    JoystickDirection getDirection();
     int getX();
     int getY();
-    void sleepForMs(long long delayInMs);
-    void writeReg(uint8_t reg_addr, uint16_t value);
-    uint16_t readReg(uint8_t reg_addr);
-    uint16_t swapAndScale(uint16_t value);
+
+    void onRelease();
+    void processStateEvent(const bool isRising, StateEvent* risingEvent, StateEvent* fallingEvent);
+    void processButton(); // Thread
 
     // Constants
-    static constexpr const char* I2C_BUS = "/dev/i2c-1";
-    static constexpr int I2C_DEVICE_ADDRESS = 0x48;
-    static constexpr uint8_t REG_CONFIGURATION = 0x01;
-    static constexpr uint8_t REG_DATA = 0x00;
-    static constexpr uint16_t X_CHANNEL = 0x83D2;
-    static constexpr uint16_t Y_CHANNEL = 0x83C2;
-
-    static constexpr int minThresh = 10;
-    static constexpr int maxThresh = 1590;
+    static constexpr int minThresh = 400;
+    static constexpr int maxThresh = 1100;
     static constexpr int coordIdle = 0;
     static constexpr int coordMin = -100;
     static constexpr int coordMax = 100;
+
+    static const GpioChip JOYSTICK_GPIO_CHIP = GPIO_CHIP_2;
+    static constexpr int JOYSTICK_LINE_NUM = 15;
 };
 
 #endif // JOYSTICK_H
