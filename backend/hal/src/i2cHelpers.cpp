@@ -49,6 +49,24 @@ namespace i2cOperations {
         return value;
     }
 
+    uint8_t read_i2c_reg8(int i2c_file_desc, uint8_t reg_addr)
+    {
+        // To read a register, must first write the address
+        int bytes_written = write(i2c_file_desc, &reg_addr, sizeof(reg_addr));
+        if (bytes_written != sizeof(reg_addr)) {
+            perror("Unable to write i2c register.");
+            exit(EXIT_FAILURE);
+        }
+        // Now read the value and return it
+        uint8_t value = 0;
+        int bytes_read = read(i2c_file_desc, &value, sizeof(value));
+        if (bytes_read != sizeof(value)) {
+            perror("Unable to read i2c register");
+            exit(EXIT_FAILURE);
+        }
+        return value;
+    }
+
     //Turn the raw numbers read from ADC into a useable format
     uint16_t swap_and_scale(uint16_t value) {
         uint16_t swap = ((value & 0xFF00) >> 8 | (value & 0x00FF) << 8);

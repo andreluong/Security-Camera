@@ -16,9 +16,16 @@ add_custom_command(TARGET server POST_BUILD
   COMMENT "Copying ARM executable to public NFS directory")
 
   
-# Copy the model folder to NFS?
+# Copy the model folder to NFS
 add_custom_command(TARGET server POST_BUILD 
 COMMAND "${CMAKE_COMMAND}" -E copy_directory
    "${CMAKE_SOURCE_DIR}/models"
    "~/cmpt433/public/models" 
+COMMENT "Copying model files to public NFS directory")
+
+# Copy the model folder to NFS
+add_custom_command(TARGET server POST_BUILD 
+COMMAND "${CMAKE_COMMAND}" -E copy_directory
+   "${CMAKE_SOURCE_DIR}/sounds"
+   "~/cmpt433/public/sounds" 
 COMMENT "Copying model files to public NFS directory")

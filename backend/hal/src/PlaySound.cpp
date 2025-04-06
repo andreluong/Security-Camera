@@ -196,7 +196,8 @@ void Audio::fillPlaybackBuffer(short* buff, int size) {
 }
 
 Sound::Sound() {
-    const char* SoundPath = "/mnt/remote/myApps/beatbox-wave-files/267560__alienxxx__beep_sequence_01.wav";
+    // const char* SoundPath = "/mnt/remote/myApps/beatbox-wave-files/267560__alienxxx__beep_sequence_01.wav";
+    const char* SoundPath = "sounds/alarm_guillaume.wav";
     Audio::readWaveFileIntoMemory(SoundPath, &sound);
 }
 
@@ -206,4 +207,5 @@ Sound::~Sound() {
 
 void Sound::playSound() {
     Audio::queueSound(&sound);
+    std::cout << "Sound played!" << std::endl;
 }

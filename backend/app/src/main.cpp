@@ -10,6 +10,7 @@
 #include "CommandServer.h"
 #include "Microservo.h"
 #include "PanTiltKit.h"
+#include "PlaySound.h"
 #include <memory>
 
 #define USB_CAMERA_PORT 3
@@ -46,6 +47,11 @@ int main() {
     std::thread commandThread([&]() {
         commandServer.run(9001);
     });
+
+    //Just testing sound
+    // Audio::init();
+    // Sound sound;
+    // sound.playSound();
 
     commandThread.join();
     cameraSendThread.join();
