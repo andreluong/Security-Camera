@@ -17,7 +17,7 @@ export type CommandType = "count" | "left" | "right" | "up" | "down" | "alarm" |
 
 export function useCommandSocket() {
   const [peopleCount, setPeopleCount] = useState<number>(0);
-  const websocketRef = useRef<WebSocket>(undefined);
+  const websocketRef = useRef<WebSocket>(null);
 
   // Send a command to the server
   const sendCommand = useCallback((command: CommandType) => {
@@ -46,19 +46,13 @@ export function useCommandSocket() {
         if (commandResponse.startsWith("count")) {
           const countString = commandResponse.split(":")[1].trim();
           setPeopleCount(parseInt(countString));
-
-        // TODO: Snapshot
-        } else if (commandResponse.startsWith("snapshot")) {
-          
         }
       } catch (error) {
         console.error("Invalid JSON received:", event.data);
       }
     };
 
-    return () => {
-      websocket.close();
-    };
+    return () => websocket.close();
   }, []);
 
   // Send count command every second

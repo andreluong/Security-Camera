@@ -1,12 +1,11 @@
 #include "i2cHelpers.h"
 
-
 namespace i2cOperations {
-    int init_i2c_bus(const char* bus, int address)
+    int init_i2c_bus(const std::string& bus, int address)
     {
-        int i2c_file_desc = open(bus, O_RDWR);
+        int i2c_file_desc = open(bus.c_str(), O_RDWR);
         if (i2c_file_desc == -1) {
-            printf("I2C DRV: Unable to open bus for read/write (%s)\n", bus);
+            printf("I2C DRV: Unable to open bus for read/write (%s)\n", bus.c_str());
             perror("Error is:");
             exit(EXIT_FAILURE);
         }

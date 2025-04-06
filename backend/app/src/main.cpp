@@ -13,6 +13,8 @@
 #include "PlaySound.h"
 #include "LCD_Display.h"
 #include <memory>
+#include "joystick.h"
+#include "gpio.h"
 
 #define USB_CAMERA_PORT 3
 #define CAMERA_DELAY_MS 30
@@ -23,13 +25,13 @@ const std::string modelConfig = "models/MobileNetSSD.prototxt";
 int main() {
     std::cout << "Starting server\n";
 
+    Gpio gpio;
     BroadcastServer broadcastServer;
     PersonDetector personDetector;
     CameraFeed cameraFeed(personDetector);
-     
-    auto pan = std::make_unique<Microservo>("/dev/hat/pwm/GPIO6/", 10, 0, 180);
-    auto tilt = std::make_unique<Microservo>("/dev/hat/pwm/GPIO14/", 30, 0, 90);
-    PanTiltKit panTiltKit(std::move(pan), std::move(tilt));
+
+    PanTiltKit panTiltKit;
+    Joystick joystick(panTiltKit);    
 
     CommandServer commandServer = CommandServer(panTiltKit, personDetector);
 

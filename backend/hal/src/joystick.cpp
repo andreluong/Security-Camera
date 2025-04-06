@@ -1,97 +1,107 @@
 #include "joystick.h"
 #include <cstdio>
+#include "i2cHelpers.h"
+#include <chrono>
+#include <cassert>
+#include <pthread.h>
 
-Joystick::Joystick() : is_initialized(false), i2c_file_desc(0) {
-    init();
+// Construct joystick with thread
+Joystick::Joystick(PanTiltKit& kit) : is_initialized(true), is_running(true), pressed(false), i2c_file_desc(0), 
+    panTiltKit(kit), joystickLine(GpioLine(JOYSTICK_GPIO_CHIP, JOYSTICK_LINE_NUM)) 
+{
+    i2c_file_desc = i2cOperations::init_i2c_bus(I2CDRV_LINUX_BUS, I2C_DEVICE_ADDRESS);
+    
+    // Setup the states
+    states.reserve(2);
+    State one = {StateEvent(&states[0], nullptr), StateEvent(&states[1], nullptr)};
+    State two = {StateEvent(&states[0], [this]() { onRelease(); }), StateEvent(&states[1], nullptr)};
+    states.push_back(one);
+    states.push_back(two);
+    currentState = &states[0];
+    
+    joystickThread = std::thread(&Joystick::processDirection, this);
+    buttonThread = std::thread(&Joystick::processButton, this);
 }
 
+// Terminate thread when object is destroyed
 Joystick::~Joystick() {
-    cleanup();
-}
-
-void Joystick::sleepForMs(long long delayInMs) {
-    const long long NS_PER_MS = 1000000;
-    const long long NS_PER_SECOND = 1000000000;
-    long long delayNs = delayInMs * NS_PER_MS;
-    int seconds = delayNs / NS_PER_SECOND;
-    int nanoseconds = delayNs % NS_PER_SECOND;
-    struct timespec reqDelay = {seconds, nanoseconds};
-    nanosleep(&reqDelay, nullptr);
-}
-
-void Joystick::init() {
-    i2c_file_desc = open(I2C_BUS, O_RDWR);
-    if (i2c_file_desc == -1) {
-        perror("Unable to open I2C bus");
-        exit(EXIT_FAILURE);
-    }
-    if (ioctl(i2c_file_desc, I2C_SLAVE, I2C_DEVICE_ADDRESS) == -1) {
-        perror("Unable to set I2C device to slave address");
-        exit(EXIT_FAILURE);
-    }
-    is_initialized = true;
-}
-
-void Joystick::cleanup() {
     assert(is_initialized);
+    is_running = false;
+    pthread_cancel(buttonThread.native_handle()); // Must be cancelled due to hanging
+    if (joystickThread.joinable()) joystickThread.join();
+    if (buttonThread.joinable()) buttonThread.join();
     close(i2c_file_desc);
     is_initialized = false;
+    printf("Joystick module shutdown.\n");
 }
 
-void Joystick::writeReg(uint8_t reg_addr, uint16_t value) {
-    uint8_t buffer[3];
-    buffer[0] = reg_addr;
-    buffer[1] = static_cast<uint8_t>(value & 0xFF);
-    buffer[2] = static_cast<uint8_t>((value & 0xFF00) >> 8);
-    if (write(i2c_file_desc, buffer, 3) != 3) {
-        perror("Unable to write I2C register");
-        exit(EXIT_FAILURE);
+// Changes servo angles based on direction
+// TODO: Add pan/tilt kit
+// TODO: Include alarm for press
+void Joystick::processDirection() {
+    while (is_running) {
+        auto direction = getDirection();
+        switch (direction) {
+            case JoystickDirection::UP: {
+                panTiltKit.increaseTiltAngle();
+                std::printf("Joystick Direction: UP\n");
+                break;
+            }
+            case JoystickDirection::DOWN: {
+                panTiltKit.decreaseTiltAngle();
+                std::printf("Joystick Direction: DOWN\n");
+                break;
+            }
+            case JoystickDirection::LEFT: {
+                panTiltKit.increasePanAngle();
+                std::printf("Joystick Direction: LEFT\n");
+                break;
+            }
+            case JoystickDirection::RIGHT: {
+                panTiltKit.decreasePanAngle();
+                std::printf("Joystick Direction: RIGHT\n");
+                break;
+            }
+            case JoystickDirection::PRESSED: {
+                std::printf("Joystick Direction: PRESSED\n");
+                break;
+            }
+            default: break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-}
-
-uint16_t Joystick::readReg(uint8_t reg_addr) {
-    if (write(i2c_file_desc, &reg_addr, sizeof(reg_addr)) != sizeof(reg_addr)) {
-        perror("Unable to write I2C register.");
-        exit(EXIT_FAILURE);
-    }
-    uint16_t value = 0;
-    if (read(i2c_file_desc, &value, sizeof(value)) != sizeof(value)) {
-        perror("Unable to read I2C register");
-        exit(EXIT_FAILURE);
-    }
-    return value;
-}
-
-uint16_t Joystick::swapAndScale(uint16_t value) {
-    uint16_t swap = ((value & 0xFF00) >> 8) | ((value & 0x00FF) << 8);
-    return swap >> 4;
 }
 
 int Joystick::getX() {
-    assert(is_initialized);
-    writeReg(REG_CONFIGURATION, X_CHANNEL);
-    sleepForMs(5);
-    uint16_t raw_read = readReg(REG_DATA);
-    uint16_t scaled = swapAndScale(raw_read);
+    i2cOperations::write_i2c_reg16(i2c_file_desc, REG_CONFIGURATION, JOYSTICK_X);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    uint16_t raw_read = i2cOperations::read_i2c_reg16(i2c_file_desc, REG_DATA);
+    uint16_t scaled_read = i2cOperations::swap_and_scale(raw_read);
 
-    if (scaled >= maxThresh) return coordMax;
-    if (scaled <= minThresh) return coordMin;
+    if (scaled_read >= maxThresh) return coordMax;
+    if (scaled_read <= minThresh) return coordMin;
     return coordIdle;
 }
 
 int Joystick::getY() {
-    assert(is_initialized);
-    writeReg(REG_CONFIGURATION, Y_CHANNEL);
-    sleepForMs(5);
-    uint16_t raw_read = readReg(REG_DATA);
-    uint16_t scaled = swapAndScale(raw_read);
+    i2cOperations::write_i2c_reg16(i2c_file_desc, REG_CONFIGURATION, JOYSTICK_Y);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    uint16_t raw_read = i2cOperations::read_i2c_reg16(i2c_file_desc, REG_DATA);
+    uint16_t scaled_read = i2cOperations::swap_and_scale(raw_read);
 
-    if (scaled >= maxThresh) return coordMin;
-    if (scaled <= minThresh) return coordMax;
+    if (scaled_read >= maxThresh) return coordMin;
+    if (scaled_read <= minThresh) return coordMax;
     return coordIdle;
 }
 
 JoystickDirection Joystick::getDirection() {
+    assert(is_initialized);
+
+    if (pressed) {
+        pressed = false; // Reset after reading
+        return JoystickDirection::PRESSED;
+    }
+
     int xVal = getX();
     if (xVal == coordMax) return JoystickDirection::RIGHT;
     if (xVal == coordMin) return JoystickDirection::LEFT;
@@ -103,16 +113,47 @@ JoystickDirection Joystick::getDirection() {
     return JoystickDirection::IDLE;
 }
 
-JoystickDirection Joystick::getXDirection() {
-    int xVal = getX();
-    if (xVal == coordMax) return JoystickDirection::RIGHT;
-    if (xVal == coordMin) return JoystickDirection::LEFT;
-    return JoystickDirection::IDLE;
+void Joystick::onRelease() {
+    pressed = true;
 }
 
-JoystickDirection Joystick::getYDirection() {
-    int yVal = getY();
-    if (yVal == coordMax) return JoystickDirection::UP;
-    if (yVal == coordMin) return JoystickDirection::DOWN;
-    return JoystickDirection::IDLE;
+void Joystick::processStateEvent(const bool isRising, StateEvent* risingEvent, StateEvent* fallingEvent) {
+    StateEvent* pStateEvent = nullptr;
+
+    // Change state events
+    if (isRising) {
+        pStateEvent = risingEvent;
+    } else {
+        pStateEvent = fallingEvent;
+    }
+
+    // Execute action if exists
+    if (pStateEvent->action != nullptr) {
+        pStateEvent->action();
+    }
+
+    currentState = pStateEvent->nextState;
+}
+
+void Joystick::processButton() {
+    while (is_running) {
+        struct gpiod_line_bulk bulkEvents;
+        int numEvents = joystickLine.waitForLineChange(&bulkEvents);
+
+        for (int i = 0; i < numEvents; i++) {
+            struct gpiod_line* line_handle = gpiod_line_bulk_get_line(&bulkEvents, i);
+            
+            // Get line events
+            struct gpiod_line_event event;
+            if (gpiod_line_event_read(line_handle, &event) == 0) {
+                // Run the state machine
+                bool isRising = event.event_type == GPIOD_LINE_EVENT_RISING_EDGE;
+                processStateEvent(isRising, &currentState->rising, &currentState->falling);
+            } else {
+                perror("Line Event Read.\n");
+                break;
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 }

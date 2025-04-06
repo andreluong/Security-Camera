@@ -3,7 +3,7 @@ add_executable(server ${MY_SOURCES})
 
 target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_link_libraries(server PRIVATE hal websocketpp opencv asound)
+target_link_libraries(server PRIVATE hal websocketpp opencv gpiod asound)
 
 # ALSA support
 find_package(ALSA REQUIRED)
