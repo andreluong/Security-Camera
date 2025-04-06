@@ -3,91 +3,86 @@
 #include <iostream>
 #include <unistd.h>
 #include <chrono>
+#include <cassert>
 
-JoystickButton::JoystickButton(const char* chipPath, unsigned int line)
-    : chipPath(chipPath), lineNumber(line), running(false), pressed(false) {
-    
-    chip = gpiod_chip_open(chipPath);
-    if (!chip) {
-        perror("Failed to open GPIO chip");
-        return;
-    }
+const GpioChip JOYSTICK_GPIO_CHIP = GPIO_CHIP_2;
+constexpr int JOYSTICK_LINE_NUM = 15;
 
-    buttonLine = gpiod_chip_get_line(chip, lineNumber);
-    if (!buttonLine) {
-        perror("Failed to get GPIO line");
-        gpiod_chip_close(chip);
-        chip = nullptr;
-        return;
-    }
+JoystickButton::JoystickButton() : is_initialized(true), running(true), pressed(false), 
+    joystickLine(GpioLine(JOYSTICK_GPIO_CHIP, JOYSTICK_LINE_NUM))
+{
+    // Setup the states
+    states.reserve(2);
+    State one = {StateEvent(&states[0], nullptr), StateEvent(&states[1], nullptr)};
+    State two = {StateEvent(&states[0], [this]() { onRelease(); }), StateEvent(&states[1], nullptr)};
+    states.push_back(one);
+    states.push_back(two);
+    currentState = &states[0];
 
-    if (gpiod_line_request_input(buttonLine, "joystick_btn") < 0) {
-        perror("Failed to request button line as input");
-        gpiod_chip_close(chip);
-        chip = nullptr;
-        buttonLine = nullptr;
-        return;
-    }
+    listenerThread = std::thread(&JoystickButton::processButton, this);
 }
 
 JoystickButton::~JoystickButton() {
-    stopListening();
-    if (buttonLine) {
-        gpiod_line_release(buttonLine);
-    }
-    if (chip) {
-        gpiod_chip_close(chip);
-    }
-}
-
-void JoystickButton::startListening() {
-    if (!running && buttonLine) {
-        running = true;
-        listenerThread = std::thread(&JoystickButton::listenerLoop, this);
-        listenerThread.detach(); // Background thread
-    }
-}
-
-void JoystickButton::stopListening() {
+    assert(is_initialized);
     running = false;
+    if (listenerThread.joinable()) listenerThread.join();
+    is_initialized = false;
 }
 
 bool JoystickButton::isPressed(){
     if (pressed) {
         pressed = false; // Reset after reading
+        printf("pressed\n");
         return true;
     }
     return false;
 }
 
-void JoystickButton::listenerLoop() {
-    int lastState = 1; // Assume HIGH
-    long lastPressTime = 0;
-
-    while (running) {
-        if (!buttonLine) continue;
-
-        int currentState = gpiod_line_get_value(buttonLine);
-        long currentTime = getCurrentTimeMs();
-
-        // Used externally to suppress air drum triggering
-        if (currentState == 0) {
-            pressed = true;
-        }
-
-        if (lastState == 1 && currentState == 0) {
-            if (currentTime - lastPressTime > 200) { // 200ms debounce
-                lastPressTime = currentTime;
-                lastState = currentState;
-            }
-        }
-        
-        lastState = currentState;
-        usleep(100000); // 100ms delay
-    }
+void JoystickButton::onRelease(void) {
+    pressed = true;
 }
 
 
-long JoystickButton::getCurrentTimeMs() const {
-    return PeriodTimer::getCurrentTimeMs();
+// Read button input; will definitely refactor
+void JoystickButton::processStateEvent(const bool isRising, StateEvent* risingEvent, StateEvent* fallingEvent) {
+    StateEvent* pStateEvent = nullptr;
+
+    // Change state events
+    if (isRising) {
+        pStateEvent = risingEvent;
+    } else {
+        pStateEvent = fallingEvent;
+    }
+
+    // Execute action if exists
+    if (pStateEvent->action != nullptr) {
+        pStateEvent->action();
+    }
+
+    currentState = pStateEvent->nextState;
+}
+
+void JoystickButton::processButton() {
+    // int lastState = 1; // Assume HIGH
+    // long lastPressTime = 0;
+
+    while (running) {
+        struct gpiod_line_bulk bulkEvents;
+        int numEvents = joystickLine.waitForLineChange(&bulkEvents);
+
+        for (int i = 0; i < numEvents; i++) {
+            struct gpiod_line* line_handle = gpiod_line_bulk_get_line(&bulkEvents, i);
+
+            // Get line events
+            struct gpiod_line_event event;
+            if (gpiod_line_event_read(line_handle, &event) == -1) {
+                perror("Line Event");
+                exit(EXIT_FAILURE);
+            }
+
+            // Run the state machine
+            bool isRising = event.event_type == GPIOD_LINE_EVENT_RISING_EDGE;
+            processStateEvent(isRising, &currentState->rising, &currentState->falling);
+        }
+    }
 }

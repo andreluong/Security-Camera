@@ -4,28 +4,46 @@
 #include <gpiod.h>
 #include <thread>
 #include <atomic>
+#include "gpio.h"
+#include <vector>
+#include <functional>
+
+struct State;
+
+struct StateEvent {
+    State* nextState = nullptr;
+    std::function<void()> action = nullptr;
+
+    StateEvent(State* next, std::function<void()> act): nextState(std::move(next)), action(std::move(act)) {}
+};
+
+struct State {
+    StateEvent rising;
+    StateEvent falling;
+};
 
 class JoystickButton {
 public:
-    JoystickButton(const char* chipPath = "/dev/gpiochip2", unsigned int line = 15);
+    JoystickButton();
     ~JoystickButton();
 
-    void startListening();
-    void stopListening();
     bool isPressed();
 
 private:
-    const char* chipPath;
-    unsigned int lineNumber;
+    std::atomic<bool> is_initialized;
     std::atomic<bool> running;
     std::atomic<bool> pressed;
-
-    void listenerLoop();
-    long getCurrentTimeMs() const;    
-
     std::thread listenerThread;
-    struct gpiod_chip* chip = nullptr;
-    struct gpiod_line* buttonLine = nullptr;
+
+    GpioLine joystickLine;
+
+    std::vector<State> states;
+    void onRelease();
+
+    State* currentState = nullptr;
+
+    void processStateEvent(const bool isRising, StateEvent* risingEvent, StateEvent* fallingEvent);
+    void processButton();
 };
 
 #endif // JOYSTICK_BUTTON_H
