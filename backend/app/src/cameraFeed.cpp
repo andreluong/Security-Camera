@@ -1,12 +1,22 @@
 #include "cameraFeed.h"
 #include <mutex>
 #include <thread>
+#include <iostream>
 
 #define USB_CAMERA_PORT 3
 #define CAMERA_DELAY_MS 30
 
-CameraFeed::CameraFeed(PersonDetector& pd)
-    : isRunning(true), personDetector(pd) {}
+CameraFeed::CameraFeed(PersonDetector& pd, BroadcastServer& server): isRunning(true), personDetector(pd), broadcastServer(server) {
+    captureThread = std::thread(&CameraFeed::captureAndQueueFrame, this);
+    detectThread = std::thread(&CameraFeed::dequeAndSendFrame, this);
+}
+
+CameraFeed::~CameraFeed() {
+    isRunning = false;
+    detectThread.join();
+    captureThread.join();
+    std::cout << "Camera turned off" << std::endl;
+}
 
 void CameraFeed::captureAndQueueFrame() {
     // Open camera
@@ -26,9 +36,10 @@ void CameraFeed::captureAndQueueFrame() {
         frameQueue.push_front(frame);
         frameMutex.unlock();
     }
+    capture.release();
 }
 
-void CameraFeed::dequeAndSendFrame(BroadcastServer& broadcastServer) {
+void CameraFeed::dequeAndSendFrame() {
     while(isRunning) {
         if(!frameQueue.empty()) {
             cv::Mat frame = frameQueue.back();

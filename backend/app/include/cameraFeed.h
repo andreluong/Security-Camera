@@ -10,16 +10,19 @@
 class CameraFeed {
     public:
         CameraFeed();
-        CameraFeed(PersonDetector& pd);
-        ~CameraFeed() = default;
+        CameraFeed(PersonDetector& pd, BroadcastServer& server);
+        ~CameraFeed();
         void captureAndQueueFrame();
-        void dequeAndSendFrame(BroadcastServer& broadcastServer);
+        void dequeAndSendFrame();
         void captureAndSend();
     private:
         std::deque<cv::Mat> frameQueue;
         std::mutex frameMutex;
+        std::thread captureThread;
+        std::thread detectThread;
         bool isRunning;
         PersonDetector& personDetector;
+        BroadcastServer& broadcastServer;
 
         
 };
