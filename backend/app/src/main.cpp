@@ -23,8 +23,8 @@ const std::string modelWeights = "models/MobileNetSSD.caffemodel";
 const std::string modelConfig = "models/MobileNetSSD.prototxt";
 
 int main() {
-    std::cout << "Starting server\n";
     Gpio gpio;
+    std::cout << "Starting server\n";
 
     BroadcastServer broadcastServer;
     PersonDetector personDetector;

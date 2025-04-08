@@ -12,6 +12,7 @@ NightLight::NightLight() :isRunning(true) {
 
 NightLight::~NightLight() {
     isRunning = false;
+    lightThread.join();
     markLEDs(BLACK, pR5Base);
     freeR5MmapAddr(pR5Base);
     std::printf("Night Light module shutdown.\n");

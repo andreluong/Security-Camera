@@ -34,6 +34,7 @@ void CameraFeed::captureAndQueueFrame() {
         
         frameMutex.lock();
         frameQueue.push_front(frame);
+        broadcastServer.sendFrame(frame);
         frameMutex.unlock();
     }
     capture.release();
@@ -51,8 +52,8 @@ void CameraFeed::dequeAndSendFrame() {
     
             frame = personDetector.detectPeopleInFrame(frame);
             
-            //broadcast to server?
-            broadcastServer.sendFrame(frame);
+            // //broadcast to server?
+            // broadcastServer.sendFrame(frame);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(CAMERA_DELAY_MS));
     }
