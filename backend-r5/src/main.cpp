@@ -74,29 +74,33 @@ int main() {
 	strcpy((char*) SharedDataLayout::MSG_OFFSET, "Checking if shared memory works.");
 	SharedDataLayout::mem_uint32(SharedDataLayout::LED_DELAY_MS_OFFSET) = SharedMem::DEFAULT_LED_DELAY_MS;
 	// Just do random values don't bombard eyes with bright lights
-	SharedDataLayout::mem_uint32(SharedDataLayout::LED_1_OFFSET) = 0;
-	SharedDataLayout::mem_uint32(SharedDataLayout::LED_2_OFFSET) = 0;
-	SharedDataLayout::mem_uint32(SharedDataLayout::LED_3_OFFSET) = 0;
-	SharedDataLayout::mem_uint32(SharedDataLayout::LED_4_OFFSET) = 0;
-	SharedDataLayout::mem_uint32(SharedDataLayout::LED_5_OFFSET) = 0;
-	SharedDataLayout::mem_uint32(SharedDataLayout::LED_6_OFFSET) = 0;
-	SharedDataLayout::mem_uint32(SharedDataLayout::LED_7_OFFSET) = 0;
-	SharedDataLayout::mem_uint32(SharedDataLayout::LED_8_OFFSET) = 0;
+	SharedDataLayout::mem_uint32(SharedDataLayout::LED_1_OFFSET) = 0xfffffff;
+	SharedDataLayout::mem_uint32(SharedDataLayout::LED_2_OFFSET) = 0xfffffff;
+	SharedDataLayout::mem_uint32(SharedDataLayout::LED_3_OFFSET) = 0xfffffff;
+	SharedDataLayout::mem_uint32(SharedDataLayout::LED_4_OFFSET) = 0xfffffff;
+	SharedDataLayout::mem_uint32(SharedDataLayout::LED_5_OFFSET) = 0xfffffff;
+	SharedDataLayout::mem_uint32(SharedDataLayout::LED_6_OFFSET) = 0xfffffff;
+	SharedDataLayout::mem_uint32(SharedDataLayout::LED_7_OFFSET) = 0xfffffff;
+	SharedDataLayout::mem_uint32(SharedDataLayout::LED_8_OFFSET) = 0xfffffff;
 
 	//TODO: Depending on offset values, change LED color and position
+	int i = 0;
 	while (true) {
-		horizontalColor = SharedDataLayout::mem_uint32(SharedDataLayout::HORIZONTAL_DIR_OFFSET);
+		if(i == 100) {
+			i = 0;
+		}
+		SharedDataLayout::mem_uint32(SharedDataLayout::HORIZONTAL_DIR_OFFSET) = i;
 
 		// Continuously update LEDs based on offset values
 		send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_1_OFFSET));
-		send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_2_OFFSET));
-		send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_3_OFFSET));
-		send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_4_OFFSET));
-		send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_5_OFFSET));
-		send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_6_OFFSET));
-		send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_7_OFFSET));
-		send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_8_OFFSET));
-
+		// send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_2_OFFSET));
+		// send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_3_OFFSET));
+		// send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_4_OFFSET));
+		// send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_5_OFFSET));
+		// send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_6_OFFSET));
+		// send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_7_OFFSET));
+		// send_color(SharedDataLayout::mem_uint32(SharedDataLayout::LED_8_OFFSET));
+		i++;
 		uint32_t delay = SharedDataLayout::mem_uint32(SharedDataLayout::LED_DELAY_MS_OFFSET);
 		//  printf("Waiting for %d ms\n", delay);
 		k_busy_wait(delay * SharedMem::MICROSECONDS_PER_MILLISECOND);	

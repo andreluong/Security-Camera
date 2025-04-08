@@ -42,8 +42,8 @@ constexpr int NUM_LEDS = 8;
 constexpr int SHARED_MEM_LENGTH = 0x8000;
 constexpr unsigned int SHARED_MEM_BASE = 0x79020000;
 
-constexpr unsigned int WHITE_BRIGHT = 0xffffff00;
-constexpr unsigned int WHITE_DIM    = 0x0f0f0f00;
+constexpr unsigned int WHITE_BRIGHT = 0xffffff;
+constexpr unsigned int WHITE_DIM    = 0x0f0f0f;
 
 void markLEDs(uint32_t colour, volatile void* pR5Base) {
     auto base = reinterpret_cast<std::uintptr_t>(pR5Base);
@@ -62,20 +62,30 @@ void test(){
     // Get access to shared memory for my uses
     auto pR5Base = getR5MmapAddr();
 
-    LightSensor sensor;
+    // LightSensor sensor;
 
     while (true) {
-        auto lightLevel = sensor.readLightLevel();
-        printf("Light Level: 0x%03X = %d\n", lightLevel, lightLevel);
-        sleep(1);
+        // auto lightLevel = sensor.readLightLevel();
+        // printf("Light Level: 0x%03X = %d\n", lightLevel, lightLevel);
+        // sleep(1);
 
-        if (lightLevel <= 400) {
-            markLEDs(WHITE_BRIGHT, pR5Base);
-        } else if (lightLevel <= 600){
-            markLEDs(WHITE_DIM, pR5Base);
-        } else {
-            markLEDs(0x00000000, pR5Base);
+        // if (lightLevel <= 400) {
+        //     markLEDs(WHITE_BRIGHT, pR5Base);
+        // } else if (lightLevel <= 600){
+        //     markLEDs(WHITE_DIM, pR5Base);
+        // } else {
+        //     markLEDs(0x00000000, pR5Base);
+        // }
+        markLEDs(WHITE_BRIGHT, pR5Base);
+        for (int i = 0; i < 8; i++)
+        {
+            std::cout << "LED " << i << ": " << SharedMemory::mem_uint32(reinterpret_cast<std::uintptr_t>(pR5Base) 
+             + SharedMemory::LED_1_OFFSET + (i * sizeof(uint32_t))) << "\n";
         }
+        std::cout << "" << std::endl;
+        // std::cout << SharedMemory::mem_uint32(reinterpret_cast<std::uintptr_t>(pR5Base) 
+        // + SharedMemory::HORIZONTAL_DIR_OFFSET)  << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
     markLEDs(0x00000000, pR5Base);
     freeR5MmapAddr(pR5Base);
@@ -84,12 +94,12 @@ void test(){
 // ------
 
 int main() {
+    Gpio gpio;
     std::cout << "Starting server\n";
 
     test();
     return 0;
 
-    Gpio gpio;
     BroadcastServer broadcastServer;
     PersonDetector personDetector;
     CameraFeed cameraFeed(personDetector, broadcastServer);

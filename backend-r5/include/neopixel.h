@@ -17,7 +17,7 @@ namespace NeoPixel {
     constexpr int RESET_NS		= 60000; // Must be at least 50us, use 60us
 
     // Delay time includes 1 GPIO set action.
-    inline volatile int junk_delay = 0;
+    static volatile int junk_delay = 0;
     inline void delay350ns() {}
     inline void delay600ns() { for (junk_delay = 0; junk_delay < 9;  junk_delay++); }
     inline void delay700ns() { for (junk_delay = 0; junk_delay < 16; junk_delay++); }

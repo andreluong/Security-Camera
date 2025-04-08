@@ -14,5 +14,5 @@ echo start | sudo tee /sys/class/remoteproc/remoteproc2/state
 
 # echo "WORK AROUND: Reading/Writing the pins to set the MUX / direction"
 # gpioset gpiochip0 9=1   # PYMNL.9
-# gpioset gpiochip0 7=1   # LED Stick
+gpioset gpiochip0 7=1   # LED Stick
 # gpioget gpiochip0 10    # Rotary Encoder - Push
