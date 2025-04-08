@@ -1,2 +1,0 @@
-/usr/bin/arm-none-eabi-ar qc app/libapp.a CMakeFiles/app.dir/src/neopixel_driver.c.obj
-/usr/bin/arm-none-eabi-ranlib app/libapp.a

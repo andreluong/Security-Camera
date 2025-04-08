@@ -1,2 +1,0 @@
-/usr/bin/arm-none-eabi-ar qc libdrivers__gpio.a CMakeFiles/drivers__gpio.dir/gpio_davinci.c.obj
-/usr/bin/arm-none-eabi-ranlib libdrivers__gpio.a
