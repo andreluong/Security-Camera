@@ -44,18 +44,17 @@ constexpr unsigned int SHARED_MEM_BASE = 0x79020000;
 
 constexpr unsigned int WHITE_BRIGHT = 0xffffff00;
 constexpr unsigned int WHITE_DIM    = 0x0f0f0f00;
+#define TEAL_LED  0x0f000f00 // Teal
 
 void markLEDs(uint32_t colour, volatile void* pR5Base) {
-    auto base = reinterpret_cast<std::uintptr_t>(pR5Base);
-
-    SharedMemory::mem_uint32(base + SharedMemory::LED_1_OFFSET) = colour;
-    SharedMemory::mem_uint32(base + SharedMemory::LED_2_OFFSET) = colour;
-    SharedMemory::mem_uint32(base + SharedMemory::LED_3_OFFSET) = colour;
-    SharedMemory::mem_uint32(base + SharedMemory::LED_4_OFFSET) = colour;
-    SharedMemory::mem_uint32(base + SharedMemory::LED_5_OFFSET) = colour;
-    SharedMemory::mem_uint32(base + SharedMemory::LED_6_OFFSET) = colour;
-    SharedMemory::mem_uint32(base + SharedMemory::LED_7_OFFSET) = colour;
-    SharedMemory::mem_uint32(base + SharedMemory::LED_8_OFFSET) = colour;
+    MEM_UINT32((uint8_t*)pR5Base + LED_1_OFFSET) = colour;
+    MEM_UINT32((uint8_t*)pR5Base + LED_2_OFFSET) = colour;
+    MEM_UINT32((uint8_t*)pR5Base + LED_3_OFFSET) = colour;
+    MEM_UINT32((uint8_t*)pR5Base + LED_4_OFFSET) = colour;
+    MEM_UINT32((uint8_t*)pR5Base + LED_5_OFFSET) = colour;
+    MEM_UINT32((uint8_t*)pR5Base + LED_6_OFFSET) = colour;
+    MEM_UINT32((uint8_t*)pR5Base + LED_7_OFFSET) = colour;
+    MEM_UINT32((uint8_t*)pR5Base + LED_8_OFFSET) = colour;
 }
 
 void test(){
@@ -67,15 +66,17 @@ void test(){
     while (true) {
         auto lightLevel = sensor.readLightLevel();
         printf("Light Level: 0x%03X = %d\n", lightLevel, lightLevel);
-        sleep(1);
 
-        if (lightLevel <= 400) {
-            markLEDs(WHITE_BRIGHT, pR5Base);
-        } else if (lightLevel <= 600){
-            markLEDs(WHITE_DIM, pR5Base);
-        } else {
-            markLEDs(0x00000000, pR5Base);
-        }
+        // if (lightLevel <= 400) {
+        //     printf("bright light\n");
+        //     markLEDs(TEAL_LED, pR5Base);
+        // } else if (lightLevel <= 600){
+        //     markLEDs(WHITE_DIM, pR5Base);
+        // } else {
+        //     markLEDs(TEAL_LED, pR5Base);
+        // }
+        markLEDs(TEAL_LED, pR5Base);
+        sleep(1);
     }
     markLEDs(0x00000000, pR5Base);
     freeR5MmapAddr(pR5Base);
@@ -85,11 +86,24 @@ void test(){
 
 int main() {
     std::cout << "Starting server\n";
+    Gpio gpio;
 
-    test();
+    auto pR5Base = getR5MmapAddr();
+
+    LightSensor sensor;
+
+    while (true) {
+        auto lightLevel = sensor.readLightLevel();
+        printf("Light Level: 0x%03X = %d\n", lightLevel, lightLevel);
+        markLEDs(TEAL_LED, pR5Base);
+        sleep(1);
+    }
+    markLEDs(0x00000000, pR5Base);
+    freeR5MmapAddr(pR5Base);
+
+    // test();
     return 0;
 
-    Gpio gpio;
     BroadcastServer broadcastServer;
     PersonDetector personDetector;
     CameraFeed cameraFeed(personDetector, broadcastServer);

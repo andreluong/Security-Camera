@@ -2,15 +2,16 @@
 #define R5_MMAP_H
 
 #include "sharedDataLayout.h"
-#include <stdio.h>
-#include <time.h>
-#include <math.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
 #include <sys/mman.h>
+#include <cstdint>
+#include <cstdio>
+#include <ctime>
+#include <cmath>
+#include <fcntl.h>
+#include <unistd.h>
+#include <cstdlib>
 
 // General R5 Memory Sharing Routine
 // ----------------------------------------------------------------
