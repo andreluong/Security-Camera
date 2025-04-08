@@ -79,7 +79,10 @@ void test(){
         std::this_thread::sleep_for(std::chrono::milliseconds(250));
         markLEDs(WHITE_DIM, pR5Base);
         std::this_thread::sleep_for(std::chrono::milliseconds(250));
-        markLEDs(0x000f0000, pR5Base);
+        markLEDs(WHITE_BRIGHT, pR5Base);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+        break;
     }
     markLEDs(0x00000000, pR5Base);
     freeR5MmapAddr(pR5Base);
