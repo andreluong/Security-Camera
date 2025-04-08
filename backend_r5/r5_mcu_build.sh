@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Exit on error
+# Exit on error:
 set -e
 
 if [[ "$VIRTUAL_ENV" == "" ]]
@@ -9,26 +9,21 @@ then
     echo "   Suggest running:"
     echo "   source ~/zephyrproject/.venv/bin/activate"
     echo ""
-    echo "   For more info, see:"
+    echo "   For more info, see: "
     echo "   https://docs.zephyrproject.org/latest/develop/getting_started/index.html"
     exit
 fi
 
-cmake -S . -B build \
-  -DBOARD=beagley_ai/j722s/mcu_r5f0_0 \
-  -DZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb \
-  -DGNUARMEMB_TOOLCHAIN_PATH=/usr \
-  -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+cmake -S . -B build -DBOARD=beagley_ai/j722s/mcu_r5f0_0
 cd build
 make
 cd ..
 
 echo "Copying to NFS..."
 mkdir -p ~/cmpt433/public/r5/
-cp r5_app/build/zephyr/zephyr.elf ~/cmpt433/public/r5/zephyr_mcu_neopixel.elf
+cp build/zephyr/zephyr.elf ~/cmpt433/public/r5/zephyr_mcu_neopixel.elf
 cp ./load_r5_mcu.sh ~/cmpt433/public/r5/
 chmod +x ~/cmpt433/public/r5/load_r5_mcu.sh
-
 echo "--> Done building Zephyr firmware! <--"
 echo ""
 echo "To install on target:"

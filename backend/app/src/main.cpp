@@ -36,14 +36,8 @@
 #define WHITE_BRIGHT  0xffffff00
 #define WHITE_DIM     0x0f0f0f00
 
-#define GPIO_CHIP "/dev/gpiochip0"
-#define GPIO_BUTTON 7
-
-static struct gpiod_chip *chip;
-static struct gpiod_line *line;
-
-
 volatile void* pSharedMem = NULL;
+static bool keepRunning = 0;
 
 const std::string modelWeights = "models/MobileNetSSD.caffemodel";
 const std::string modelConfig = "models/MobileNetSSD.prototxt";
@@ -88,16 +82,9 @@ void write_led_color(int index, uint32_t color) {
 void test(){
     signal(SIGINT, handleSigint);
     LightSensor sensor;
-    chip = gpiod_chip_open(GPIO_CHIP);
-    line = gpiod_chip_get_line(chip, GPIO_BUTTON);
-    gipod_line_request_output(line, "neopixel, 1");
 
     pSharedMem = map_shared_memory();
     *((volatile uint32_t *)((uint8_t *)pSharedMem + LED_DELAY_MS_OFFSET)) = 10;
-
-
-
-
 
     while (keepRunning) {
         uint16_t lightLevel = sensor.readLightLevel();
@@ -124,7 +111,6 @@ void test(){
     }
     
     freeR5MmapAddr(pSharedMem);
-    return 0;
 }
 
 int main() {
