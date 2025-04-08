@@ -1,0 +1,2 @@
+/usr/bin/arm-none-eabi-ar qc libisr_tables.a CMakeFiles/isr_tables.dir/isr_tables.c.obj
+/usr/bin/arm-none-eabi-ranlib libisr_tables.a

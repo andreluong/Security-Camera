@@ -1,0 +1,53 @@
+cmake:
+  application:
+    configuration-dir: /home/don/cmpt433/work/Security-Camera/backend_r5
+    source-dir: /home/don/cmpt433/work/Security-Camera/backend_r5
+  board:
+    name: beagley_ai
+    path:
+     - /home/don/zephyrproject/zephyr/boards/beagle/beagley_ai
+    qualifiers: j722s/mcu_r5f0_0
+    revision: 
+  devicetree:
+    bindings-dirs:
+     - /home/don/zephyrproject/zephyr/dts/bindings
+    files:
+     - /home/don/zephyrproject/zephyr/boards/beagle/beagley_ai/beagley_ai_j722s_mcu_r5f0_0.dts
+     - /home/don/cmpt433/work/Security-Camera/backend_r5/boards/beagley_ai_j722s_mcu_r5f0_0.overlay
+    include-dirs:
+     - /home/don/zephyrproject/modules/hal/atmel/include
+     - /home/don/zephyrproject/modules/hal/gigadevice/include
+     - /home/don/zephyrproject/modules/hal/microchip/include
+     - /home/don/zephyrproject/modules/hal/microchip/dts
+     - /home/don/zephyrproject/modules/hal/nuvoton/dts
+     - /home/don/zephyrproject/modules/hal/nxp/dts
+     - /home/don/zephyrproject/modules/hal/stm32/dts
+     - /home/don/cmpt433/work/Security-Camera/backend_r5/include
+     - /home/don/zephyrproject/zephyr/include
+     - /home/don/zephyrproject/zephyr/include/zephyr
+     - /home/don/zephyrproject/zephyr/dts/common
+     - /home/don/zephyrproject/zephyr/dts/x86
+     - /home/don/zephyrproject/zephyr/dts/xtensa
+     - /home/don/zephyrproject/zephyr/dts/sparc
+     - /home/don/zephyrproject/zephyr/dts/riscv
+     - /home/don/zephyrproject/zephyr/dts/posix
+     - /home/don/zephyrproject/zephyr/dts/nios2
+     - /home/don/zephyrproject/zephyr/dts/arm64
+     - /home/don/zephyrproject/zephyr/dts/arm
+     - /home/don/zephyrproject/zephyr/dts/arc
+     - /home/don/zephyrproject/zephyr/dts
+    user-files:
+     - /home/don/cmpt433/work/Security-Camera/backend_r5/boards/beagley_ai_j722s_mcu_r5f0_0.overlay
+  kconfig:
+    files:
+     - /home/don/zephyrproject/zephyr/boards/beagle/beagley_ai/beagley_ai_j722s_mcu_r5f0_0_defconfig
+     - /home/don/cmpt433/work/Security-Camera/backend_r5/prj.conf
+    user-files:
+     - /home/don/cmpt433/work/Security-Camera/backend_r5/prj.conf
+  toolchain:
+    name: gnuarmemb
+    path: /usr
+  zephyr:
+    version: 4.1.99
+    zephyr-base: /home/don/zephyrproject/zephyr
+version: 0.1.0

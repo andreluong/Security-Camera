@@ -1,0 +1,2 @@
+/usr/bin/arm-none-eabi-ar qc libarch__arm__core.a CMakeFiles/arch__arm__core.dir/fatal.c.obj CMakeFiles/arch__arm__core.dir/nmi.c.obj CMakeFiles/arch__arm__core.dir/nmi_on_reset.S.obj
+/usr/bin/arm-none-eabi-ranlib libarch__arm__core.a

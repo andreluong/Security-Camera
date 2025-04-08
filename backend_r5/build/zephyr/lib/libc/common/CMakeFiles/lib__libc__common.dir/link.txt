@@ -1,0 +1,2 @@
+/usr/bin/arm-none-eabi-ar qc liblib__libc__common.a CMakeFiles/lib__libc__common.dir/source/stdlib/abort.c.obj CMakeFiles/lib__libc__common.dir/source/time/asctime.c.obj CMakeFiles/lib__libc__common.dir/source/time/gmtime_r.c.obj CMakeFiles/lib__libc__common.dir/source/time/localtime_r_utc.c.obj CMakeFiles/lib__libc__common.dir/source/time/ctime.c.obj CMakeFiles/lib__libc__common.dir/source/stdlib/malloc.c.obj CMakeFiles/lib__libc__common.dir/source/string/strnlen.c.obj
+/usr/bin/arm-none-eabi-ranlib liblib__libc__common.a

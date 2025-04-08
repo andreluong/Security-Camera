@@ -1,0 +1,2 @@
+/usr/bin/arm-none-eabi-ar qc libdrivers__serial.a CMakeFiles/drivers__serial.dir/uart_ns16550.c.obj
+/usr/bin/arm-none-eabi-ranlib libdrivers__serial.a

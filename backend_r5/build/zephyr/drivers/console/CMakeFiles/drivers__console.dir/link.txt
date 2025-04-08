@@ -1,0 +1,2 @@
+/usr/bin/arm-none-eabi-ar qc libdrivers__console.a CMakeFiles/drivers__console.dir/uart_console.c.obj
+/usr/bin/arm-none-eabi-ranlib libdrivers__console.a

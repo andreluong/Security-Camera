@@ -1,0 +1,211 @@
+/dts-v1/;
+
+/ {
+	#address-cells = < 0x1 >;
+	#size-cells = < 0x1 >;
+	model = "BeagleBoard.org BeagleY-AI";
+	compatible = "beagle,beagley-ai";
+	chosen {
+		zephyr,sram = &atcm;
+		zephyr,console = &uart1;
+	};
+	aliases {
+		joy0 = &mcu_joy;
+		btn0 = &mcu_btn;
+		neopixel = &mcu_neopixel;
+	};
+	soc {
+		#address-cells = < 0x1 >;
+		#size-cells = < 0x1 >;
+		compatible = "simple-bus";
+		ranges;
+	};
+	mcu_gpio0: gpio@4201010 {
+		compatible = "ti,davinci-gpio";
+		reg = < 0x4201010 0x100 >;
+		gpio-controller;
+		#gpio-cells = < 0x2 >;
+		ngpios = < 0x18 >;
+		status = "okay";
+		pinctrl-0 = < &mcu_gpio0_led_btn_default >;
+		pinctrl-names = "default";
+		phandle = < 0x5 >;
+	};
+	mcu_uart0: uart@4a00000 {
+		compatible = "ns16550";
+		reg = < 0x4a00000 0x100 >;
+		clock-frequency = < 0x2dc6c00 >;
+		interrupts = < 0x0 0xd9 0x2 0xf >;
+		interrupt-parent = < &vim >;
+		reg-shift = < 0x2 >;
+		status = "disabled";
+	};
+	pinctrl: pinctrl@f4000 {
+		compatible = "ti,k3-pinctrl";
+		reg = < 0xf4000 0x2ac >;
+		status = "okay";
+		uart1_rx_default: uart1_rx_default {
+			pinmux = < 0x1ac 0x50002 >;
+			phandle = < 0x4 >;
+		};
+		uart1_tx_default: uart1_tx_default {
+			pinmux = < 0x1b0 0x10002 >;
+			phandle = < 0x3 >;
+		};
+	};
+	gpio0: gpio@600010 {
+		compatible = "ti,davinci-gpio";
+		reg = < 0x600010 0x100 >;
+		gpio-controller;
+		#gpio-cells = < 0x2 >;
+		ngpios = < 0x5c >;
+		status = "disabled";
+	};
+	gpio1: gpio@601010 {
+		compatible = "ti,davinci-gpio";
+		reg = < 0x601010 0x100 >;
+		gpio-controller;
+		#gpio-cells = < 0x2 >;
+		ngpios = < 0x34 >;
+		status = "disabled";
+	};
+	uart0: uart@2800000 {
+		compatible = "ns16550";
+		reg = < 0x2800000 0x100 >;
+		clock-frequency = < 0x2dc6c00 >;
+		interrupts = < 0x0 0xd2 0x2 0xf >;
+		interrupt-parent = < &vim >;
+		reg-shift = < 0x2 >;
+		status = "disabled";
+	};
+	uart1: uart@2810000 {
+		compatible = "ns16550";
+		reg = < 0x2810000 0x100 >;
+		clock-frequency = < 0x2dc6c00 >;
+		interrupts = < 0x0 0xd3 0x2 0xf >;
+		interrupt-parent = < &vim >;
+		reg-shift = < 0x2 >;
+		status = "okay";
+		pinctrl-0 = < &uart1_tx_default &uart1_rx_default >;
+		pinctrl-names = "default";
+		current-speed = < 0x1c200 >;
+	};
+	uart2: uart@2820000 {
+		compatible = "ns16550";
+		reg = < 0x2820000 0x100 >;
+		clock-frequency = < 0x2dc6c00 >;
+		interrupts = < 0x0 0xd4 0x2 0xf >;
+		interrupt-parent = < &vim >;
+		reg-shift = < 0x2 >;
+		status = "disabled";
+	};
+	uart3: uart@2830000 {
+		compatible = "ns16550";
+		reg = < 0x2830000 0x100 >;
+		clock-frequency = < 0x2dc6c00 >;
+		interrupts = < 0x0 0xd5 0x2 0xf >;
+		interrupt-parent = < &vim >;
+		reg-shift = < 0x2 >;
+		status = "disabled";
+	};
+	uart4: uart@2840000 {
+		compatible = "ns16550";
+		reg = < 0x2840000 0x100 >;
+		clock-frequency = < 0x2dc6c00 >;
+		interrupts = < 0x0 0xd6 0x2 0xf >;
+		interrupt-parent = < &vim >;
+		reg-shift = < 0x2 >;
+		status = "disabled";
+	};
+	uart5: uart@2850000 {
+		compatible = "ns16550";
+		reg = < 0x2850000 0x100 >;
+		clock-frequency = < 0x2dc6c00 >;
+		interrupts = < 0x0 0xd7 0x2 0xf >;
+		interrupt-parent = < &vim >;
+		reg-shift = < 0x2 >;
+		status = "disabled";
+	};
+	uart6: uart@2860000 {
+		compatible = "ns16550";
+		reg = < 0x2860000 0x100 >;
+		clock-frequency = < 0x2dc6c00 >;
+		interrupts = < 0x0 0xd8 0x2 0xf >;
+		interrupt-parent = < &vim >;
+		reg-shift = < 0x2 >;
+		status = "disabled";
+	};
+	cpus {
+		#address-cells = < 0x1 >;
+		#size-cells = < 0x0 >;
+		cpu0: cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-r5";
+			reg = < 0x0 >;
+			status = "okay";
+		};
+	};
+	atcm: memory@0 {
+		device_type = "memory";
+		compatible = "zephyr,memory-region", "mmio-sram";
+		reg = < 0x0 0x8000 >;
+		zephyr,memory-region = "ATCM";
+	};
+	btcm: memory@41010000 {
+		device_type = "memory";
+		compatible = "zephyr,memory-region", "mmio-sram";
+		reg = < 0x41010000 0x8000 >;
+		zephyr,memory-region = "BTCM";
+	};
+	vim: interrupt-controller@7ff0000 {
+		#address-cells = < 0x1 >;
+		compatible = "ti,vim";
+		reg = < 0x7ff0000 0x2800 >;
+		interrupt-controller;
+		#interrupt-cells = < 0x4 >;
+		status = "okay";
+		phandle = < 0x2 >;
+	};
+	systick_timer: timer@4800000 {
+		compatible = "ti,am654-timer";
+		reg = < 0x4800000 0x70 >;
+		interrupts = < 0x0 0x1c 0x2 0xf >;
+		interrupt-parent = < &vim >;
+		status = "okay";
+	};
+	ddr0: memory@a1000000 {
+		compatible = "mmio-sram";
+		reg = < 0xa1000000 0x100000 >;
+	};
+	rsc_table: memory@a1100000 {
+		compatible = "zephyr,memory-region", "mmio-sram";
+		reg = < 0xa1100000 0x100000 >;
+		zephyr,memory-region = "RSC_TABLE";
+	};
+	ddr1: memory@a1200000 {
+		compatible = "zephyr,memory-region", "mmio-sram";
+		reg = < 0xa1200000 0xe00000 >;
+		zephyr,memory-region = "DRAM";
+	};
+	leds {
+		compatible = "gpio-leds";
+		mcu_joy: btn_gpio5 {
+			gpios = < &mcu_gpio0 0xf 0x0 >;
+		};
+		mcu_btn: btn_gpio24 {
+			gpios = < &mcu_gpio0 0xa 0x0 >;
+		};
+		mcu_neopixel: btn_gpio23 {
+			gpios = < &mcu_gpio0 0x7 0x0 >;
+		};
+	};
+	pinctrl_mcu: pinctrl_mcu@4084000 {
+		compatible = "ti,k3-pinctrl";
+		reg = < 0x4084000 0x88 >;
+		status = "okay";
+		mcu_gpio0_led_btn_default: mcu_gpio0_led_btn_default {
+			pinmux = < 0x1c 0x10007 >;
+			phandle = < 0x1 >;
+		};
+	};
+};

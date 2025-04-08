@@ -1,0 +1,34 @@
+zephyr/lib/libc/minimal/CMakeFiles/lib__libc__minimal.dir/source/string/strerror.c.obj: \
+ /home/don/zephyrproject/zephyr/lib/libc/minimal/source/string/strerror.c \
+ /home/don/cmpt433/work/Security-Camera/backend_r5/build/zephyr/include/generated/zephyr/autoconf.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/toolchain/zephyr_stdint.h \
+ /home/don/zephyrproject/zephyr/lib/libc/minimal/include/errno.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/sys/errno_private.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/toolchain.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/toolchain/gcc.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/toolchain/common.h \
+ /home/don/zephyrproject/zephyr/lib/libc/minimal/include/stdbool.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/types.h \
+ /usr/lib/gcc/arm-none-eabi/14.2.1/include/stddef.h \
+ /home/don/zephyrproject/zephyr/lib/libc/minimal/include/stdint.h \
+ /home/don/cmpt433/work/Security-Camera/backend_r5/build/zephyr/include/generated/zephyr/syscalls/errno_private.h \
+ /usr/lib/gcc/arm-none-eabi/14.2.1/include/stdarg.h \
+ /home/don/cmpt433/work/Security-Camera/backend_r5/build/zephyr/include/generated/zephyr/syscall_list.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/syscall.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/arch/syscall.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/arch/arm/syscall.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/linker/sections.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/linker/section_tags.h \
+ /home/don/zephyrproject/zephyr/lib/libc/minimal/include/string.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/sys/util.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/sys/util_macro.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/sys/util_internal.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/sys/util_loops.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/sys/util_listify.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/sys/util_internal_is_eq.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/sys/util_internal_util_inc.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/sys/util_internal_util_dec.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/sys/util_internal_util_x2.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/sys/__assert.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/sys/time_units.h \
+ /home/don/cmpt433/work/Security-Camera/backend_r5/build/zephyr/include/generated/libc/minimal/strerror_table.h

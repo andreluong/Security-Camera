@@ -1,0 +1,2 @@
+/usr/bin/arm-none-eabi-ar qc libdrivers__timer.a CMakeFiles/drivers__timer.dir/sys_clock_init.c.obj CMakeFiles/drivers__timer.dir/ti_dmtimer.c.obj
+/usr/bin/arm-none-eabi-ranlib libdrivers__timer.a

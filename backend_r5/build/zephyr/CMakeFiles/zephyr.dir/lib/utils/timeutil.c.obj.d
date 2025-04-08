@@ -1,0 +1,25 @@
+zephyr/CMakeFiles/zephyr.dir/lib/utils/timeutil.c.obj: \
+ /home/don/zephyrproject/zephyr/lib/utils/timeutil.c \
+ /home/don/cmpt433/work/Security-Camera/backend_r5/build/zephyr/include/generated/zephyr/autoconf.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/toolchain/zephyr_stdint.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/types.h \
+ /usr/lib/gcc/arm-none-eabi/14.2.1/include/stddef.h \
+ /home/don/zephyrproject/zephyr/lib/libc/minimal/include/stdint.h \
+ /home/don/zephyrproject/zephyr/lib/libc/minimal/include/errno.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/sys/errno_private.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/toolchain.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/toolchain/gcc.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/toolchain/common.h \
+ /home/don/zephyrproject/zephyr/lib/libc/minimal/include/stdbool.h \
+ /home/don/cmpt433/work/Security-Camera/backend_r5/build/zephyr/include/generated/zephyr/syscalls/errno_private.h \
+ /usr/lib/gcc/arm-none-eabi/14.2.1/include/stdarg.h \
+ /home/don/cmpt433/work/Security-Camera/backend_r5/build/zephyr/include/generated/zephyr/syscall_list.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/syscall.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/arch/syscall.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/arch/arm/syscall.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/linker/sections.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/linker/section_tags.h \
+ /home/don/zephyrproject/zephyr/include/zephyr/sys/timeutil.h \
+ /home/don/zephyrproject/zephyr/lib/libc/minimal/include/time.h \
+ /home/don/zephyrproject/zephyr/lib/libc/minimal/include/sys/_types.h \
+ /home/don/zephyrproject/zephyr/lib/libc/minimal/include/sys/_timespec.h

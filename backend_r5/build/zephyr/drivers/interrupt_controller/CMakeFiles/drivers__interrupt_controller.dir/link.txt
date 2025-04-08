@@ -1,0 +1,2 @@
+/usr/bin/arm-none-eabi-ar qc libdrivers__interrupt_controller.a CMakeFiles/drivers__interrupt_controller.dir/intc_vim.c.obj
+/usr/bin/arm-none-eabi-ranlib libdrivers__interrupt_controller.a
