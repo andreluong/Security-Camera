@@ -65,3 +65,7 @@
     pinctrl-names = "default";
     status = "okay";
 };
+
+&uart1 {
+    status = "disabled";
+};
