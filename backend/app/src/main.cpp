@@ -76,16 +76,10 @@ void test(){
         // } else {
         //     markLEDs(0x00000000, pR5Base);
         // }
-        markLEDs(WHITE_BRIGHT, pR5Base);
-        for (int i = 0; i < 8; i++)
-        {
-            std::cout << "LED " << i << ": " << SharedMemory::mem_uint32(reinterpret_cast<std::uintptr_t>(pR5Base) 
-             + SharedMemory::LED_1_OFFSET + (i * sizeof(uint32_t))) << "\n";
-        }
-        std::cout << "" << std::endl;
-        // std::cout << SharedMemory::mem_uint32(reinterpret_cast<std::uintptr_t>(pR5Base) 
-        // + SharedMemory::HORIZONTAL_DIR_OFFSET)  << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+        markLEDs(WHITE_DIM, pR5Base);
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+        markLEDs(0x000f0000, pR5Base);
     }
     markLEDs(0x00000000, pR5Base);
     freeR5MmapAddr(pR5Base);
