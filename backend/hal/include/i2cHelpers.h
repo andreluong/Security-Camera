@@ -30,7 +30,7 @@ constexpr uint16_t TLA2024_CHANNEL_CONF_3 = 0x83F2;
 // ADC channel selectors
 constexpr uint16_t JOYSTICK_Y = TLA2024_CHANNEL_CONF_0;
 constexpr uint16_t JOYSTICK_X = TLA2024_CHANNEL_CONF_1;
-constexpr uint16_t LIGHT_SENSOR = TLA2024_CHANNEL_CONF_2;
+constexpr uint16_t LIGHT_SENSOR = TLA2024_CHANNEL_CONF_3;
 
 constexpr size_t BUFFER_SIZE = sizeof(uint16_t) + 1;
 

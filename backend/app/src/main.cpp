@@ -5,7 +5,6 @@
 #include "broadcastServer.h"
 #include "personDetector.h"
 #include "i2cHelpers.h"
-#include "lightSensor.h"
 #include "cameraFeed.h"
 #include "CommandServer.h"
 #include "Microservo.h"
@@ -15,6 +14,7 @@
 #include "joystick.h"
 #include "rotary_button.h"
 #include "gpio.h"
+#include "NightLight.h"
 
 #define USB_CAMERA_PORT 3
 #define CAMERA_DELAY_MS 30
@@ -24,8 +24,8 @@ const std::string modelConfig = "models/MobileNetSSD.prototxt";
 
 int main() {
     std::cout << "Starting server\n";
-
     Gpio gpio;
+
     BroadcastServer broadcastServer;
     PersonDetector personDetector;
     CameraFeed cameraFeed(personDetector, broadcastServer);
@@ -35,6 +35,8 @@ int main() {
     RotaryButton button;
 
     CommandServer commandServer = CommandServer(panTiltKit, personDetector);
+
+    NightLight nightLight;
 
     while(!button.isPressed()) {
 
