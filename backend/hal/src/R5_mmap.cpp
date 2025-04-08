@@ -19,6 +19,8 @@ volatile void* getR5MmapAddr()
     }
     close(fd);
 
+    std::printf("got base\n");
+
     return pR5Base;
 }
 
