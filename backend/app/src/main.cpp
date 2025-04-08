@@ -36,41 +36,18 @@ int main() {
 
     CommandServer commandServer = CommandServer(panTiltKit, personDetector);
 
-    // Testing button input
-    // while(true) {
-    //     if(!button.isPressed()) {
-    //         std::cout << "I command you to press the button\n";
-    //     } else {
-    //         std::cout << "Finally!\n";
-    //         break;
-    //     }
-    // }
+    while(!button.isPressed()) {
 
-    std::thread broadcastThread([&]() {
-        broadcastServer.run(9002);
-    });
-
-    // std::thread cameraFeedThread([&]() {
-    //     cameraFeed.captureAndQueueFrame();
-    // });
-
-    // std::thread cameraSendThread([&]() {
-    //     cameraFeed.dequeAndSendFrame(broadcastServer);
-    // });
-
-    std::thread commandThread([&]() {
-        commandServer.run(9001);
-    });
-
+    }
     //Just testing sound
     // Audio::init();
     // Sound sound;
     // sound.playSound();
 
-    commandThread.join();
+    //commandThread.join();
     // cameraSendThread.join();
     // cameraFeedThread.join();   
-    broadcastThread.join();
+    //broadcastThread.join();
 
     std::cout << "Closing server\n";
 

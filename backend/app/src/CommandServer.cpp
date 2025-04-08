@@ -8,7 +8,7 @@ using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
-CommandServer::CommandServer(PanTiltKit& kit, PersonDetector& detector) : panTiltKit(kit), personDetector(detector) {
+CommandServer::CommandServer(PanTiltKit& kit, PersonDetector& detector) : panTiltKit(kit), personDetector(detector), isRunning(true) {
     // Initialize Asio Transport
     wsServer.init_asio();
 
@@ -20,6 +20,13 @@ CommandServer::CommandServer(PanTiltKit& kit, PersonDetector& detector) : panTil
     wsServer.set_open_handler(bind(&CommandServer::onOpen, this, ::_1));
     wsServer.set_close_handler(bind(&CommandServer::onClose, this, ::_1));
     wsServer.set_message_handler(bind(&CommandServer::onMessage, this, ::_1, ::_2));
+    commandThread = std::thread(&CommandServer::run, this, 9001);
+}
+
+CommandServer::~CommandServer() {
+    isRunning = false;
+    wsServer.stop();
+    if (commandThread.joinable()) commandThread.join();
 }
 
 void CommandServer::onOpen(const websocketpp::connection_hdl& hdl) {
@@ -58,9 +65,12 @@ void CommandServer::onMessage(const websocketpp::connection_hdl& hdl, const serv
 }
 
 void CommandServer::run(const uint16_t& port) {
-    wsServer.listen(port);
-    wsServer.start_accept();
-    wsServer.run();
+    while(isRunning) {
+        wsServer.listen(port);
+        wsServer.start_accept();
+        wsServer.run();
+    }
+    std::cout << "Command server stopped" << std::endl;
 }
 
 // TODO: Only disconnects client. Should close terminate program

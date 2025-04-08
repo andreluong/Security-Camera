@@ -4,7 +4,7 @@
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::bind;
 
-BroadcastServer::BroadcastServer() {
+BroadcastServer::BroadcastServer() : isRunning(true) {
     // Initialize Asio Transport
     wsServer.init_asio();
 
@@ -15,6 +15,14 @@ BroadcastServer::BroadcastServer() {
     // Register handler callbacks
     wsServer.set_open_handler(bind(&BroadcastServer::onOpen, this, ::_1));
     wsServer.set_close_handler(bind(&BroadcastServer::onClose, this, ::_1));
+    broadcastThread = std::thread(&BroadcastServer::run, this, 9002);
+}
+
+BroadcastServer::~BroadcastServer() {
+    isRunning = false;
+    wsServer.stop();
+    if (broadcastThread.joinable()) broadcastThread.join();
+    std::cout << "Broadcast server off" << std::endl;
 }
 
 void BroadcastServer::onOpen(const websocketpp::connection_hdl& hdl) {
@@ -28,9 +36,12 @@ void BroadcastServer::onClose(const websocketpp::connection_hdl& hdl) {
 }
 
 void BroadcastServer::run(const uint16_t& port) {
-    wsServer.listen(port);
-    wsServer.start_accept();
-    wsServer.run();
+    while(isRunning) {
+        wsServer.listen(port);
+        wsServer.start_accept();
+        wsServer.run();
+    }
+    std::cout << "Broadcast server stop" << std::endl;
 }
 
 // Send frame to all connections

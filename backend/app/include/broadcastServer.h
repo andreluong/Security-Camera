@@ -7,13 +7,14 @@
 #include <websocketpp/server.hpp>
 #include <opencv2/opencv.hpp>
 #include <set>
+#include <thread>
 
 typedef websocketpp::server<websocketpp::config::asio> server;
 
 class BroadcastServer {
 public:
     BroadcastServer();
-    ~BroadcastServer() = default;
+    ~BroadcastServer();
 
     void onOpen(const websocketpp::connection_hdl& hdl);
     void onClose(const websocketpp::connection_hdl& hdl);
@@ -27,6 +28,9 @@ private:
 
     server wsServer;
     connList wsConnections;
+    bool isRunning;
+    std::thread broadcastThread;
+    void stop();
 };
 
 #endif

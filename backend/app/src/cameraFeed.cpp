@@ -37,6 +37,7 @@ void CameraFeed::captureAndQueueFrame() {
         frameMutex.unlock();
     }
     capture.release();
+    std::cout << "Camera capture turned off" << std::endl;
 }
 
 void CameraFeed::dequeAndSendFrame() {

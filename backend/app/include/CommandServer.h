@@ -8,6 +8,7 @@
 #include <set>
 #include "PanTiltKit.h"
 #include "personDetector.h"
+#include <thread>
 
 /**
  * Commands:
@@ -26,7 +27,7 @@ typedef websocketpp::server<websocketpp::config::asio> server;
 class CommandServer {
 public:
     CommandServer(PanTiltKit& kit, PersonDetector& detector);
-    ~CommandServer() = default;
+    ~CommandServer();
 
     void onOpen(const websocketpp::connection_hdl& hdl);
     void onClose(const websocketpp::connection_hdl& hdl);
@@ -41,6 +42,9 @@ private:
     PersonDetector& personDetector;
     server wsServer;
     connList wsConnections;
+
+    bool isRunning;
+    std::thread commandThread;
 
     void terminate(const websocketpp::connection_hdl& hdl);
     void sendPeopleCount(const websocketpp::connection_hdl& hdl, const server::message_ptr& msg);
