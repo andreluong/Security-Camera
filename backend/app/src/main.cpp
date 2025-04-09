@@ -37,14 +37,11 @@ int main() {
     CommandServer commandServer = CommandServer(panTiltKit, personDetector);
 
     NightLight nightLight;
-
     while(!button.isPressed()) {
 
     }
     //Just testing sound
-    // Audio::init();
-    // Sound sound;
-    // sound.playSound();
+
 
     //commandThread.join();
     // cameraSendThread.join();

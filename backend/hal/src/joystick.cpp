@@ -10,7 +10,6 @@ Joystick::Joystick(PanTiltKit& kit) : is_initialized(true), is_running(true), pr
     panTiltKit(kit), joystickLine(GpioLine(JOYSTICK_GPIO_CHIP, JOYSTICK_LINE_NUM)) 
 {
     i2c_file_desc = i2cOperations::init_i2c_bus(I2CDRV_LINUX_BUS, I2C_DEVICE_ADDRESS);
-    
     // Setup the states
     states.reserve(2);
     State one = {StateEvent(&states[0], nullptr), StateEvent(&states[1], nullptr)};
@@ -64,6 +63,7 @@ void Joystick::processDirection() {
             }
             case JoystickDirection::PRESSED: {
                 std::printf("Joystick Direction: PRESSED\n");
+                alarm.playSound();
                 break;
             }
             default: break;

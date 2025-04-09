@@ -48,7 +48,7 @@ void CommandServer::onMessage(const websocketpp::connection_hdl& hdl, const serv
         {"right", [this] { panTiltKit.decreasePanAngle(); }},
         {"up", [this] { panTiltKit.increaseTiltAngle(); }},
         {"down", [this] { panTiltKit.decreaseTiltAngle(); }},
-        {"alarm", [] { /* Alarm */ }},
+        {"alarm", [this] { alarm.playSound();  }},
         {"stop", [this, &hdl] { terminate(hdl); }}
     };
 

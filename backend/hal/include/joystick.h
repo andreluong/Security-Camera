@@ -14,6 +14,7 @@
 #include <vector>
 #include <functional>
 #include "PanTiltKit.h"
+#include "PlaySound.h"
 
 struct State;
 
@@ -51,6 +52,7 @@ private:
     int i2c_file_desc;
     PanTiltKit& panTiltKit;
     GpioLine joystickLine;
+    Sound alarm;
     std::vector<State> states;
     State* currentState = nullptr;
 

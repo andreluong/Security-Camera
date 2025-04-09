@@ -36,6 +36,10 @@ namespace {
 
 
 void Audio::init() {
+    static std::atomic<bool> initialized = false;
+    if (initialized) return; // Already initialized
+    initialized = true;
+
     setVolume(80);
 
     std::lock_guard<std::mutex> lock(audioMutex);
@@ -198,11 +202,13 @@ void Audio::fillPlaybackBuffer(short* buff, int size) {
 Sound::Sound() {
     // const char* SoundPath = "/mnt/remote/myApps/beatbox-wave-files/267560__alienxxx__beep_sequence_01.wav";
     const char* SoundPath = "sounds/alarm_guillaume.wav";
+    Audio::init();
     Audio::readWaveFileIntoMemory(SoundPath, &sound);
 }
 
 Sound::~Sound() {
     Audio::freeWaveFileData(&sound);
+    Audio::cleanup();
 }
 
 void Sound::playSound() {
