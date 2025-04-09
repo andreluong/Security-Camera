@@ -96,9 +96,9 @@ function App() {
         <div className='flex flex-col text-black bg-white border-4 border-l-0 border-black text-start'>
           {/* Stats */}
           <div className='p-4 border-b-4 border-black'>
-            <h2 className='mb-2 text-xl font-semibold'>Stats</h2>
-            <p>People: {peopleCount}</p>
-            <p>Runtime: {formatTime(runtime)}</p>
+            <h2 className='mb-2 text-xl font-semibold gradient-text-transition'>Stats</h2>
+            <p className='gradient-text-transition'>People: {peopleCount}</p>
+            <p className='gradient-text-transition'>Runtime: {formatTime(runtime)}</p>
           </div>
 
           {/* Snapshots */}
