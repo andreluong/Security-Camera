@@ -41,7 +41,7 @@ private:
     
     PanTiltKit& panTiltKit;
     PersonDetector& personDetector;
-    Sound alarm;
+    Alarm alarm;
     server wsServer;
     connList wsConnections;
 

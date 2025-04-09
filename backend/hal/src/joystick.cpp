@@ -63,7 +63,7 @@ void Joystick::processDirection() {
             }
             case JoystickDirection::PRESSED: {
                 std::printf("Joystick Direction: PRESSED\n");
-                alarm.playSound();
+                alarm.playAlarm();
                 break;
             }
             default: break;
