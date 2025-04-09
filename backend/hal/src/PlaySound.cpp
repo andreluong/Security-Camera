@@ -16,6 +16,10 @@
 #define SAMPLE_SIZE (sizeof(short))
 #define MAX_SOUND_BITES 100
 #define AUDIOMIXER_MAX_VOLUME 100
+#define DEFAULT_VOLUME 60
+
+const char* card = "default";
+const char* selem_name = "PCM";
 
 std::thread Audio::playbackThread;   // Define static thread
 std::atomic<bool> Audio::stopping(false);  // Define static atomic variable
@@ -41,7 +45,7 @@ void Audio::init() {
     if (initialized) return; // Already initialized
     initialized = true;
 
-    setVolume(80);
+    setVolume(DEFAULT_VOLUME);
 
     std::lock_guard<std::mutex> lock(audioMutex);
     for (auto& sb : soundBites) {
@@ -85,11 +89,16 @@ void Audio::init() {
 
 
 void Audio::cleanup() {
+    static std::atomic<bool> destroyed = false;
+    if (destroyed) return; // Already destroyed
+    destroyed = true;
+
     std::cout << "Stopping audio...\n";
     stopping = true;
     if(playbackThread.joinable()) playbackThread.join();
     delete[] playbackBuffer;
     playbackBuffer = nullptr;
+
     snd_pcm_drain(handle);
     snd_pcm_close(handle);
 }
@@ -158,9 +167,6 @@ void Audio::setVolume(int newVolume) {
     snd_mixer_t* mixerHandle;
     snd_mixer_selem_id_t* sid;
 
-    const char* card = "default";
-    const char* selem_name = "PCM";
-
     snd_mixer_open(&mixerHandle, 0);
     snd_mixer_attach(mixerHandle, card);
     snd_mixer_selem_register(mixerHandle, NULL, NULL);
@@ -202,10 +208,8 @@ void Audio::fillPlaybackBuffer(short* buff, int size) {
 }
 
 Alarm::Alarm(const char* SoundPath) {
-    // const char* SoundPath = "/mnt/remote/myApps/beatbox-wave-files/267560__alienxxx__beep_sequence_01.wav";
-    const char* soundFile = SoundPath;
     Audio::init();
-    Audio::readWaveFileIntoMemory(soundFile, &sound);
+    Audio::readWaveFileIntoMemory(SoundPath, &sound);
 }
 
 Alarm::~Alarm() {

@@ -1,17 +1,15 @@
 #ifndef PLAYSOUND_H
 #define PLAYSOUND_H
 
-#include <cstddef>  // for size_t
+#include <cstddef>
 #include <thread>
 #include <atomic>
 
-// Structure for holding WAV audio data
 struct wavedata_t {
     int numSamples;
     short* pData;
 };
 
-// AudioMixer class for low-level audio playback
 class Audio {
 public:
     static void init();
@@ -38,4 +36,4 @@ private:
     wavedata_t sound;
 };
 
-#endif // PLAYSOUND_H
+#endif

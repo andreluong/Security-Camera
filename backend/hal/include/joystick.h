@@ -46,7 +46,6 @@ public:
     ~Joystick();
 
 private:
-    std::atomic<bool> is_initialized;
     std::atomic<bool> is_running;
     std::atomic<bool> pressed;
     int i2c_file_desc;

@@ -31,7 +31,7 @@ void RotaryButton::onRelease() {
 }
 
 bool RotaryButton::isPressed() {
-    return pressed;
+    return pressed.load();
 }
 
 void RotaryButton::processStateEvent(const bool isRising, ButtonStateEvent* risingEvent, ButtonStateEvent* fallingEvent) {
@@ -53,7 +53,7 @@ void RotaryButton::processStateEvent(const bool isRising, ButtonStateEvent* risi
 }
 
 void RotaryButton::processButton() {
-    while (is_running) {
+    while (is_running.load()) {
         struct gpiod_line_bulk bulkEvents;
         int numEvents = btnLine.waitForLineChange(&bulkEvents);
 

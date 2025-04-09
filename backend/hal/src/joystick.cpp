@@ -6,7 +6,7 @@
 #include <pthread.h>
 
 // Construct joystick with thread
-Joystick::Joystick(PanTiltKit& kit) : is_initialized(true), is_running(true), pressed(false), i2c_file_desc(0), 
+Joystick::Joystick(PanTiltKit& kit) : is_running(true), pressed(false), i2c_file_desc(0), 
     panTiltKit(kit), joystickLine(GpioLine(JOYSTICK_GPIO_CHIP, JOYSTICK_LINE_NUM)) 
 {
     i2c_file_desc = i2cOperations::init_i2c_bus(I2CDRV_LINUX_BUS, I2C_DEVICE_ADDRESS);
@@ -24,21 +24,18 @@ Joystick::Joystick(PanTiltKit& kit) : is_initialized(true), is_running(true), pr
 
 // Terminate thread when object is destroyed
 Joystick::~Joystick() {
-    assert(is_initialized);
     is_running = false;
     pthread_cancel(buttonThread.native_handle()); // Must be cancelled due to hanging
     if (joystickThread.joinable()) joystickThread.join();
     if (buttonThread.joinable()) buttonThread.join();
     close(i2c_file_desc);
-    is_initialized = false;
     printf("Joystick module shutdown.\n");
 }
 
 // Changes servo angles based on direction
-// TODO: Add pan/tilt kit
-// TODO: Include alarm for press
+// Play alarm sound when pressed
 void Joystick::processDirection() {
-    while (is_running) {
+    while (is_running.load()) {
         auto direction = getDirection();
         switch (direction) {
             case JoystickDirection::UP: {
@@ -68,7 +65,7 @@ void Joystick::processDirection() {
             }
             default: break;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
 
@@ -95,9 +92,7 @@ int Joystick::getY() {
 }
 
 JoystickDirection Joystick::getDirection() {
-    assert(is_initialized);
-
-    if (pressed) {
+    if (pressed.load()) {
         pressed = false; // Reset after reading
         return JoystickDirection::PRESSED;
     }
