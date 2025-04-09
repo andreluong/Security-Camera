@@ -14,7 +14,7 @@
 #include <vector>
 #include <functional>
 #include "PanTiltKit.h"
-#include "PlaySound.h"
+#include "Alarm.h"
 
 struct State;
 
@@ -42,7 +42,7 @@ enum class JoystickDirection {
 
 class Joystick {
 public:
-    Joystick(PanTiltKit& kit);
+    Joystick(PanTiltKit& kit, Alarm& a);
     ~Joystick();
 
 private:
@@ -50,8 +50,8 @@ private:
     std::atomic<bool> pressed;
     int i2c_file_desc;
     PanTiltKit& panTiltKit;
+    Alarm& alarm;
     GpioLine joystickLine;
-    Alarm alarm;
     std::vector<State> states;
     State* currentState = nullptr;
 
