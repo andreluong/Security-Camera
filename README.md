@@ -8,7 +8,7 @@ The camera is mounted on a pan/tilt kit controlled via PWM signals for adjustabl
 - Real-time video streaming
 - Adjustable camera angles via pan/tilt kit
 - User-friendly web application with board control
-- Night light to brighten camera view
+- Night light to brighten camera view using Neopixel and R5
 - Alarm to alert people
 - Snapshots to document suspicious figures
 
