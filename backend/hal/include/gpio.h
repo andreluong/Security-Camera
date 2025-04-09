@@ -15,8 +15,6 @@ class Gpio {
 public:
     Gpio();
     ~Gpio();
-private:
-    bool is_initialized;
 };
 
 class GpioLine {
@@ -29,7 +27,6 @@ public:
 
     int waitForLineChange(struct gpiod_line_bulk* bulkEvents);
 private:
-    bool is_initialized;
     struct gpiod_line* line;
 };
 
