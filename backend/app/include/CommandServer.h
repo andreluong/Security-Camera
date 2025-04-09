@@ -8,6 +8,7 @@
 #include <set>
 #include "PanTiltKit.h"
 #include "personDetector.h"
+#include "PlaySound.h"
 #include <thread>
 
 /**
@@ -40,6 +41,7 @@ private:
     
     PanTiltKit& panTiltKit;
     PersonDetector& personDetector;
+    Sound alarm;
     server wsServer;
     connList wsConnections;
 
