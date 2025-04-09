@@ -13,8 +13,23 @@
 #include "gpio.h"
 #include "PanTiltKit.h"
 #include "Alarm.h"
-#include "Button.h"
+#include <functional>
 #include <memory>
+
+struct State;
+
+struct StateEvent {
+    State* nextState = nullptr;
+    std::function<void()> action = nullptr;
+
+    StateEvent(State* next, std::function<void()> act) 
+        : nextState(std::move(next)), action(std::move(act)) {}
+};
+
+struct State {
+    StateEvent rising;
+    StateEvent falling;
+};
 
 enum class JoystickDirection {
     IDLE,
@@ -32,17 +47,25 @@ public:
 
 private:
     std::atomic<bool> is_running;
+    std::atomic<bool> pressed;
     int i2c_file_desc;
     PanTiltKit& panTiltKit;
     Alarm& alarm;
+    GpioLine joystickLine;
+    std::vector<State> states;
+    State* currentState = nullptr;
 
     std::thread joystickThread;
-    std::unique_ptr<Button> button;
+    std::thread buttonThread;
 
     void processDirection(); // Thread
     JoystickDirection getDirection();
     int getX();
     int getY();
+
+    void onRelease();
+    void processStateEvent(const bool isRising, StateEvent* risingEvent, StateEvent* fallingEvent);
+    void processButton(); // Thread
 
     // Constants
     static constexpr int minThresh = 400;

@@ -7,8 +7,8 @@ using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
-CommandServer::CommandServer(PanTiltKit& kit, PersonDetector& detector, CameraFeed& feed) 
-    : panTiltKit(kit), personDetector(detector), cameraFeed(feed), isRunning(true) {
+CommandServer::CommandServer(PanTiltKit& kit, PersonDetector& detector, CameraFeed& feed, Alarm& a) 
+    : panTiltKit(kit), personDetector(detector), cameraFeed(feed), alarm(a), isRunning(true) {
     // Initialize Asio Transport
     wsServer.init_asio();
 
