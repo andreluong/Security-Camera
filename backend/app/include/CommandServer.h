@@ -30,7 +30,7 @@ typedef websocketpp::server<websocketpp::config::asio> server;
 
 class CommandServer {
 public:
-    CommandServer(PanTiltKit& kit, PersonDetector& detector, CameraFeed& feed, Alarm& a);
+    CommandServer(PanTiltKit& kit, PersonDetector& detector, CameraFeed& feed, Alarm &a);
     ~CommandServer();
 
     void onOpen(const websocketpp::connection_hdl& hdl);

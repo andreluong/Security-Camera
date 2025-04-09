@@ -6,17 +6,28 @@
 #include <pthread.h>
 
 // Construct joystick with thread
-Joystick::Joystick(PanTiltKit& kit, Alarm& a) : is_running(true), i2c_file_desc(0), panTiltKit(kit), alarm(a) {
+Joystick::Joystick(PanTiltKit& kit, Alarm& a) 
+    : is_running(true), i2c_file_desc(0), panTiltKit(kit), alarm(a), joystickLine(GpioLine(JOYSTICK_GPIO_CHIP, JOYSTICK_LINE_NUM)) {
     i2c_file_desc = i2cOperations::init_i2c_bus(I2CDRV_LINUX_BUS, I2C_DEVICE_ADDRESS);
+
+    // Setup the states
+    states.reserve(2);
+    State one = {StateEvent(&states[0], nullptr), StateEvent(&states[1], nullptr)};
+    State two = {StateEvent(&states[0], [this]() { onRelease(); }), StateEvent(&states[1], nullptr)};
+    states.push_back(one);
+    states.push_back(two);
+    currentState = &states[0];
+
     joystickThread = std::thread(&Joystick::processDirection, this);
-    button = std::make_unique<Button>(GpioLine(JOYSTICK_GPIO_CHIP, JOYSTICK_LINE_NUM));
+    buttonThread = std::thread(&Joystick::processButton, this);
 }
 
 // Terminate thread when object is destroyed
 Joystick::~Joystick() {
-    button->setIsRunning(false);
+    pthread_cancel(buttonThread.native_handle()); // Must be cancelled due to hanging
     is_running = false;
     if (joystickThread.joinable()) joystickThread.join();
+    if (buttonThread.joinable()) buttonThread.join();
     close(i2c_file_desc);
     printf("Joystick module shutdown.\n");
 }
@@ -81,8 +92,8 @@ int Joystick::getY() {
 }
 
 JoystickDirection Joystick::getDirection() {
-    if (button->isPressed()) {
-        button->setPressed(false); // Reset after reading
+    if (pressed.load()) {
+        pressed = false; // Reset after reading
         return JoystickDirection::PRESSED;
     }
 
@@ -95,4 +106,46 @@ JoystickDirection Joystick::getDirection() {
     if (yVal == coordMin) return JoystickDirection::DOWN;
 
     return JoystickDirection::IDLE;
+}
+
+void Joystick::onRelease() {
+    pressed = true;
+}
+
+void Joystick::processStateEvent(const bool isRising, StateEvent* risingEvent, StateEvent* fallingEvent) {
+    StateEvent* pStateEvent = nullptr;
+
+    // Change state events
+    if (isRising) {
+        pStateEvent = risingEvent;
+    } else {
+        pStateEvent = fallingEvent;
+    }
+
+    // Execute action if exists
+    if (pStateEvent->action != nullptr) {
+        pStateEvent->action();
+    }
+    currentState = pStateEvent->nextState;
+}
+
+void Joystick::processButton() {
+    while (is_running) {
+        struct gpiod_line_bulk bulkEvents;
+        int numEvents = joystickLine.waitForLineChange(&bulkEvents);
+        for (int i = 0; i < numEvents; i++) {
+            struct gpiod_line* line_handle = gpiod_line_bulk_get_line(&bulkEvents, i);
+            // Get line events
+            struct gpiod_line_event event;
+            if (gpiod_line_event_read(line_handle, &event) == 0) {
+                // Run the state machine
+                bool isRising = event.event_type == GPIOD_LINE_EVENT_RISING_EDGE;
+                processStateEvent(isRising, &currentState->rising, &currentState->falling);
+            } else {
+                perror("Line Event Read.\n");
+                break;
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 }
