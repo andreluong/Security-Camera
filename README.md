@@ -8,7 +8,9 @@ The camera is mounted on a pan/tilt kit controlled via PWM signals for adjustabl
 - Real-time video streaming
 - Adjustable camera angles via pan/tilt kit
 - User-friendly web application with board control
-- TODO: night light, complete joystick functionality, LCD screen, snapshots
+- Night light to brighten camera view
+- Alarm to alert people
+- Snapshots to document suspicious figures
 
 ### ⚡️ Tech Stack
 
