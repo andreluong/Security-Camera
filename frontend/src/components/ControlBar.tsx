@@ -47,6 +47,9 @@ export default function ControlBar({
 
   return (
     <div className='flex flex-row justify-center gap-4 p-4 text-black bg-white border-4 border-t-0 border-black'>
+		<button className='btn gradient-text-transition' onClick={() => sendCommand("toggle")}>
+			Toggle
+		</button>
 		<button className='btn gradient-text-transition' onClick={storeCurrentImage}>
 			Snapshot
 		</button>
