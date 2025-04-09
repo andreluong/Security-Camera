@@ -38,9 +38,9 @@ export default function Snapshots({
   return (
     <div className='flex flex-col flex-grow min-h-0 p-4'>
 			<div className="flex flex-row justify-between mb-2 text-xl">
-				<h2 className='font-semibold'>Snapshots</h2>
+				<h2 className='font-semibold gradient-text-transition'>Snapshots</h2>
 				<button className='text-red-600 btn' onClick={clearAllSnapshots}>
-					<Icon icon="material-symbols:delete-forever-outline" width="28" height="28" />
+					<Icon icon="material-symbols:delete-forever-outline" width="28" height="28" color="#ff0000" />
 				</button>
 			</div>
 			<div className='h-[580px] space-y-2 overflow-y-auto overflow-x-hidden pr-4 w-[320px]'>

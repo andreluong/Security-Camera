@@ -40,13 +40,6 @@ int main() {
     while(!button.isPressed()) {
 
     }
-    //Just testing sound
-
-
-    //commandThread.join();
-    // cameraSendThread.join();
-    // cameraFeedThread.join();   
-    //broadcastThread.join();
 
     std::cout << "Closing server\n";
 

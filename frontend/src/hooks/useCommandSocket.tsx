@@ -5,6 +5,7 @@ const COMMAND_SERVER = "ws://192.168.7.2:9001";
 /**
  * Commands:
  * 
+ * - "toggle": Toggles between orignal & processed view
  * - "count": Receives people count
  * - "left": Moves pan left
  * - "right": Moves pan right
@@ -13,7 +14,7 @@ const COMMAND_SERVER = "ws://192.168.7.2:9001";
  * - "alarm": Triggers alarm
  * - "stop": Terminates program
  */
-export type CommandType = "count" | "left" | "right" | "up" | "down" | "alarm" | "stop";
+export type CommandType = "toggle" | "count" | "left" | "right" | "up" | "down" | "alarm" | "stop";
 
 export function useCommandSocket() {
   const [peopleCount, setPeopleCount] = useState<number>(0);
@@ -55,11 +56,11 @@ export function useCommandSocket() {
     return () => websocket.close();
   }, []);
 
-  // Send count command every second
+  // Send count command every 500 ms
   useEffect(() => {
     const interval = setInterval(() => {
       sendCommand("count");
-    }, 1000);
+    }, 500);
 
     return () => clearInterval(interval);
   }, [sendCommand]);

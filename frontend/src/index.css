@@ -18,13 +18,20 @@
 
 @layer components {
   .gradient-text {
-    background: linear-gradient(90deg, #7f22fe 0%, #ad46ff 100%);
+    background: linear-gradient(90deg, #ff0000 0%, #fa2689 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
-  .gradient-background {
-    background: linear-gradient(90deg, #7f22fe 0%, #ad46ff 100%);
+  .gradient-text-transition {
+    background: linear-gradient(90deg, #ff0000 0%, #fa2689 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: black;
+    transition: -webkit-text-fill-color 0.3s ease-in-out;
+  }
+
+  .gradient-text-transition:hover {
+    -webkit-text-fill-color: transparent;
   }
 
   .hover-shadow {
