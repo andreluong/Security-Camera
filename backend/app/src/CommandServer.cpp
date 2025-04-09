@@ -2,13 +2,13 @@
 #include <iostream>
 #include <string_view>
 #include <unordered_map>
-#include "personDetector.h"
 
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
-CommandServer::CommandServer(PanTiltKit& kit, PersonDetector& detector) : panTiltKit(kit), personDetector(detector), isRunning(true) {
+CommandServer::CommandServer(PanTiltKit& kit, PersonDetector& detector, CameraFeed& feed) 
+    : panTiltKit(kit), personDetector(detector), cameraFeed(feed), isRunning(true) {
     // Initialize Asio Transport
     wsServer.init_asio();
 
@@ -43,6 +43,7 @@ void CommandServer::onClose(const websocketpp::connection_hdl& hdl) {
 void CommandServer::onMessage(const websocketpp::connection_hdl& hdl, const server::message_ptr& msg) {
     // All valid commands
     std::unordered_map<std::string, std::function<void()>> commandMap{
+        {"toggle", [this] { cameraFeed.toggle(); }},
         {"count", [this, &hdl, &msg] { sendPeopleCount(hdl, msg); }},
         {"left", [this] { panTiltKit.increasePanAngle(); }},
         {"right", [this] { panTiltKit.decreasePanAngle(); }},
@@ -65,7 +66,7 @@ void CommandServer::onMessage(const websocketpp::connection_hdl& hdl, const serv
 }
 
 void CommandServer::run(const uint16_t& port) {
-    while(isRunning) {
+    while(isRunning.load()) {
         wsServer.listen(port);
         wsServer.start_accept();
         wsServer.run();
@@ -73,8 +74,6 @@ void CommandServer::run(const uint16_t& port) {
     std::cout << "Command server stopped" << std::endl;
 }
 
-// TODO: Only disconnects client. Should close terminate program
-// [2025-03-29 02:02:03] [disconnect] Disconnect close local:[1000,client exit] remote:[1000,client exit]
 void CommandServer::terminate(const websocketpp::connection_hdl& hdl) {
     wsServer.close(hdl, websocketpp::close::status::normal, "client exit");
 }

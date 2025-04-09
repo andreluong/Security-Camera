@@ -1,16 +1,9 @@
-#include <opencv2/opencv.hpp>
-#include <opencv2/dnn.hpp>
 #include <iostream>
-#include <thread>
 #include "broadcastServer.h"
 #include "personDetector.h"
-#include "i2cHelpers.h"
 #include "cameraFeed.h"
 #include "CommandServer.h"
-#include "Microservo.h"
 #include "PanTiltKit.h"
-#include "PlaySound.h"
-#include <memory>
 #include "joystick.h"
 #include "rotary_button.h"
 #include "gpio.h"
@@ -23,8 +16,9 @@ const std::string modelWeights = "models/MobileNetSSD.caffemodel";
 const std::string modelConfig = "models/MobileNetSSD.prototxt";
 
 int main() {
+    std::printf("Starting server...\n");
+
     Gpio gpio;
-    std::cout << "Starting server\n";
 
     BroadcastServer broadcastServer;
     PersonDetector personDetector;
@@ -32,23 +26,17 @@ int main() {
 
     PanTiltKit panTiltKit;
     Joystick joystick(panTiltKit);
+    NightLight nightLight;
+
+    CommandServer commandServer = CommandServer(panTiltKit, personDetector, cameraFeed);
+
     RotaryButton button;
 
-    CommandServer commandServer = CommandServer(panTiltKit, personDetector);
-
-    NightLight nightLight;
     while(!button.isPressed()) {
 
     }
-    //Just testing sound
 
-
-    //commandThread.join();
-    // cameraSendThread.join();
-    // cameraFeedThread.join();   
-    //broadcastThread.join();
-
-    std::cout << "Closing server\n";
+    std::printf("Closing server...\n");
 
     return 0;
 }
