@@ -8,7 +8,7 @@ using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
-CommandServer::CommandServer(PanTiltKit& kit, PersonDetector& detector) : panTiltKit(kit), personDetector(detector), isRunning(true) {
+CommandServer::CommandServer(PanTiltKit& kit, PersonDetector& detector, Alarm& a) : panTiltKit(kit), personDetector(detector), alarm(a), isRunning(true) {
     // Initialize Asio Transport
     wsServer.init_asio();
 
@@ -48,7 +48,7 @@ void CommandServer::onMessage(const websocketpp::connection_hdl& hdl, const serv
         {"right", [this] { panTiltKit.decreasePanAngle(); }},
         {"up", [this] { panTiltKit.increaseTiltAngle(); }},
         {"down", [this] { panTiltKit.decreaseTiltAngle(); }},
-        {"alarm", [this] { alarm.playSound();  }},
+        {"alarm", [this] { alarm.alert();  }},
         {"stop", [this, &hdl] { terminate(hdl); }}
     };
 

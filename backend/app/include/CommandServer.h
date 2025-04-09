@@ -10,6 +10,8 @@
 #include "personDetector.h"
 #include "PlaySound.h"
 #include <thread>
+#include "Alarm.h"
+#include "AudioMixer.h"
 
 /**
  * Commands:
@@ -27,7 +29,7 @@ typedef websocketpp::server<websocketpp::config::asio> server;
 
 class CommandServer {
 public:
-    CommandServer(PanTiltKit& kit, PersonDetector& detector);
+    CommandServer(PanTiltKit& kit, PersonDetector& detector, Alarm& a);
     ~CommandServer();
 
     void onOpen(const websocketpp::connection_hdl& hdl);
@@ -41,7 +43,7 @@ private:
     
     PanTiltKit& panTiltKit;
     PersonDetector& personDetector;
-    Sound alarm;
+    Alarm& alarm;
     server wsServer;
     connList wsConnections;
 

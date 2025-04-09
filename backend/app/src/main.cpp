@@ -15,6 +15,7 @@
 #include "rotary_button.h"
 #include "gpio.h"
 #include "NightLight.h"
+#include "Alarm.h"
 
 #define USB_CAMERA_PORT 3
 #define CAMERA_DELAY_MS 30
@@ -30,11 +31,13 @@ int main() {
     PersonDetector personDetector;
     CameraFeed cameraFeed(personDetector, broadcastServer);
 
+    AudioMixer audioMixer;
+    Alarm alarm(audioMixer);
     PanTiltKit panTiltKit;
-    Joystick joystick(panTiltKit);
+    Joystick joystick(panTiltKit, alarm);
     RotaryButton button;
 
-    CommandServer commandServer = CommandServer(panTiltKit, personDetector);
+    CommandServer commandServer = CommandServer(panTiltKit, personDetector, alarm);
 
     NightLight nightLight;
     while(!button.isPressed()) {

@@ -3,13 +3,16 @@
 
 #include <cstddef>  // for size_t
 
-// Structure for holding WAV audio data
 struct wavedata_t {
     int numSamples;
     short* pData;
 };
 
-// AudioMixer class for low-level audio playback
+struct playbackSound_t {
+    wavedata_t* pSound;
+    int location;
+};
+
 class Audio {
 public:
     static void init();
@@ -22,15 +25,14 @@ public:
     static int getVolume();
 };
 
-// BeatBox class for managing and playing a single snare sound
-class Sound {
-public:
-    Sound();            // Loads snare audio on construction
-    ~Sound();           // Frees snare memory on destruction
-    void playSound();     // Queue snare sound for playback
+// class Sound {
+// public:
+//     Sound();
+//     ~Sound(); 
+//     void playSound();
 
-private:
-    wavedata_t sound;
-};
+// private:
+//     wavedata_t sound;
+// };
 
 #endif // PLAYSOUND_H

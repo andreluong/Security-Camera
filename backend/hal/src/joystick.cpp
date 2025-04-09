@@ -6,8 +6,8 @@
 #include <pthread.h>
 
 // Construct joystick with thread
-Joystick::Joystick(PanTiltKit& kit) : is_initialized(true), is_running(true), pressed(false), i2c_file_desc(0), 
-    panTiltKit(kit), joystickLine(GpioLine(JOYSTICK_GPIO_CHIP, JOYSTICK_LINE_NUM)) 
+Joystick::Joystick(PanTiltKit& kit, Alarm& a) : is_initialized(true), is_running(true), pressed(false), i2c_file_desc(0), 
+    panTiltKit(kit), alarm(a), joystickLine(GpioLine(JOYSTICK_GPIO_CHIP, JOYSTICK_LINE_NUM)) 
 {
     i2c_file_desc = i2cOperations::init_i2c_bus(I2CDRV_LINUX_BUS, I2C_DEVICE_ADDRESS);
     // Setup the states
@@ -63,7 +63,7 @@ void Joystick::processDirection() {
             }
             case JoystickDirection::PRESSED: {
                 std::printf("Joystick Direction: PRESSED\n");
-                alarm.playSound();
+                alarm.alert();
                 break;
             }
             default: break;

@@ -19,21 +19,15 @@
 
 // Internal AudioMixer state
 namespace {
-    struct playbackSound_t {
-        wavedata_t* pSound;
-        int location;
-    };
-
     snd_pcm_t* handle = nullptr;
     short* playbackBuffer = nullptr;
     unsigned long playbackBufferSize = 0;
-    pthread_t playbackThreadId;
+    pthread_t playbackThread;
     std::atomic<bool> stopping = false;
     std::mutex audioMutex;
     int volume = 80;
     playbackSound_t soundBites[MAX_SOUND_BITES];
 }
-
 
 void Audio::init() {
     static std::atomic<bool> initialized = false;
@@ -50,14 +44,14 @@ void Audio::init() {
 
     int err = snd_pcm_open(&handle, "default", SND_PCM_STREAM_PLAYBACK, 0);
     if (err < 0) {
-        std::cerr << "Playback open error: " << snd_strerror(err) << std::endl;
+        printf("Playback open error: %s\n", snd_strerror(err));
         exit(EXIT_FAILURE);
     }
 
     err = snd_pcm_set_params(handle, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED,
                              NUM_CHANNELS, SAMPLE_RATE, 1, 50000);
     if (err < 0) {
-        std::cerr << "Playback set_params error: " << snd_strerror(err) << std::endl;
+        printf("Playback set_params error: %s\n", snd_strerror(err));
         exit(EXIT_FAILURE);
     }
 
@@ -65,7 +59,7 @@ void Audio::init() {
     snd_pcm_get_params(handle, &unusedBufferSize, &playbackBufferSize);
     playbackBuffer = new short[playbackBufferSize];
 
-    pthread_create(&playbackThreadId, nullptr, [](void*) -> void* {
+    pthread_create(&playbackThread, nullptr, [](void*) -> void* {
         while (!stopping) {
             Audio::fillPlaybackBuffer(playbackBuffer, playbackBufferSize);
             snd_pcm_sframes_t frames = snd_pcm_writei(handle, playbackBuffer, playbackBufferSize);
@@ -84,7 +78,7 @@ void Audio::init() {
 void Audio::cleanup() {
     std::cout << "Stopping audio...\n";
     stopping = true;
-    pthread_join(playbackThreadId, nullptr);
+    pthread_join(playbackThread, nullptr);
     snd_pcm_drain(handle);
     snd_pcm_close(handle);
     delete[] playbackBuffer;
@@ -199,19 +193,19 @@ void Audio::fillPlaybackBuffer(short* buff, int size) {
     }
 }
 
-Sound::Sound() {
-    // const char* SoundPath = "/mnt/remote/myApps/beatbox-wave-files/267560__alienxxx__beep_sequence_01.wav";
-    const char* SoundPath = "sounds/alarm_guillaume.wav";
-    Audio::init();
-    Audio::readWaveFileIntoMemory(SoundPath, &sound);
-}
+// Sound::Sound() {
+//     // const char* SoundPath = "/mnt/remote/myApps/beatbox-wave-files/267560__alienxxx__beep_sequence_01.wav";
+//     const char* SoundPath = "sounds/alarm_guillaume.wav";
+//     Audio::init();
+//     Audio::readWaveFileIntoMemory(SoundPath, &sound);
+// }
 
-Sound::~Sound() {
-    Audio::freeWaveFileData(&sound);
-    Audio::cleanup();
-}
+// Sound::~Sound() {
+//     Audio::freeWaveFileData(&sound);
+//     Audio::cleanup();
+// }
 
-void Sound::playSound() {
-    Audio::queueSound(&sound);
-    std::cout << "Sound played!" << std::endl;
-}
+// void Sound::playSound() {
+//     Audio::queueSound(&sound);
+//     std::cout << "Sound played!" << std::endl;
+// }
