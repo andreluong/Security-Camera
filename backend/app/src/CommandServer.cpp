@@ -8,7 +8,8 @@ using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
-CommandServer::CommandServer(PanTiltKit& kit, PersonDetector& detector) : panTiltKit(kit), personDetector(detector), isRunning(true) {
+CommandServer::CommandServer(PanTiltKit& kit, PersonDetector& detector, CameraFeed& feed) 
+    : panTiltKit(kit), personDetector(detector), cameraFeed(feed), isRunning(true) {
     // Initialize Asio Transport
     wsServer.init_asio();
 
@@ -43,6 +44,7 @@ void CommandServer::onClose(const websocketpp::connection_hdl& hdl) {
 void CommandServer::onMessage(const websocketpp::connection_hdl& hdl, const server::message_ptr& msg) {
     // All valid commands
     std::unordered_map<std::string, std::function<void()>> commandMap{
+        {"toggle", [this] { cameraFeed.toggle(); }},
         {"count", [this, &hdl, &msg] { sendPeopleCount(hdl, msg); }},
         {"left", [this] { panTiltKit.increasePanAngle(); }},
         {"right", [this] { panTiltKit.decreasePanAngle(); }},

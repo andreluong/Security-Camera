@@ -7,6 +7,7 @@
 #include <websocketpp/server.hpp>
 #include <set>
 #include "PanTiltKit.h"
+#include "cameraFeed.h"
 #include "personDetector.h"
 #include "PlaySound.h"
 #include <thread>
@@ -27,7 +28,7 @@ typedef websocketpp::server<websocketpp::config::asio> server;
 
 class CommandServer {
 public:
-    CommandServer(PanTiltKit& kit, PersonDetector& detector);
+    CommandServer(PanTiltKit& kit, PersonDetector& detector, CameraFeed& feed);
     ~CommandServer();
 
     void onOpen(const websocketpp::connection_hdl& hdl);
@@ -41,6 +42,7 @@ private:
     
     PanTiltKit& panTiltKit;
     PersonDetector& personDetector;
+    CameraFeed& cameraFeed;
     Alarm alarm;
     server wsServer;
     connList wsConnections;

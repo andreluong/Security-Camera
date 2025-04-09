@@ -34,7 +34,7 @@ int main() {
     Joystick joystick(panTiltKit);
     RotaryButton button;
 
-    CommandServer commandServer = CommandServer(panTiltKit, personDetector);
+    CommandServer commandServer = CommandServer(panTiltKit, personDetector, cameraFeed);
 
     NightLight nightLight;
     while(!button.isPressed()) {
