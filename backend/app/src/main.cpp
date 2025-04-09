@@ -11,12 +11,6 @@
 #include "AudioMixer.h"
 #include "Alarm.h"
 
-#define USB_CAMERA_PORT 3
-#define CAMERA_DELAY_MS 30
-
-const std::string modelWeights = "models/MobileNetSSD.caffemodel";
-const std::string modelConfig = "models/MobileNetSSD.prototxt";
-
 int main() {
     std::printf("Starting server...\n");
 
