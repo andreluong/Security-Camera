@@ -42,4 +42,5 @@ private:
     void onRelease();
     void processStateEvent(const bool isRising, ButtonStateEvent* risingEvent, ButtonStateEvent* fallingEvent);
     void processButton();
+    void doNothing();
 };
