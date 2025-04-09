@@ -9,14 +9,12 @@
 #include "PanTiltKit.h"
 #include "cameraFeed.h"
 #include "personDetector.h"
+#include "PlaySound.h"
 #include <thread>
-#include <atomic>
-#include "Alarm.h"
 
 /**
  * Commands:
  * 
- * - "toggle": Toggles between original & processed view
  * - "count": Receives people count
  * - "left": Moves pan left
  * - "right": Moves pan right
@@ -49,7 +47,7 @@ private:
     server wsServer;
     connList wsConnections;
 
-    std::atomic<bool> isRunning;
+    bool isRunning;
     std::thread commandThread;
 
     void terminate(const websocketpp::connection_hdl& hdl);

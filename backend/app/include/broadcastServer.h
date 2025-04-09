@@ -8,7 +8,6 @@
 #include <opencv2/opencv.hpp>
 #include <set>
 #include <thread>
-#include <atomic>
 
 typedef websocketpp::server<websocketpp::config::asio> server;
 
@@ -29,7 +28,7 @@ private:
 
     server wsServer;
     connList wsConnections;
-    std::atomic<bool> isRunning;
+    bool isRunning;
     std::thread broadcastThread;
     void stop();
 };

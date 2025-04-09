@@ -54,14 +54,10 @@ cv::Mat PersonDetector::detectPeopleInFrame(cv::Mat cameraFrame) {
             // Put the label text
             std::string label =  "Person: " + std::to_string(confidence);
             cv::putText(frame, label, cv::Point(left, top - 5), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
-
             detected++;
         }
     }
-
-    // CAS
-    int oldDetected = detectedPeople.load(std::memory_order_relaxed);
-    while (!detectedPeople.compare_exchange_weak(oldDetected, detected, std::memory_order_release, std::memory_order_relaxed));
+    detectedPeople.store(detected, std::memory_order_relaxed);
 
     return frame;
 }

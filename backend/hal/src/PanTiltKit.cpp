@@ -12,12 +12,14 @@ constexpr int TILT_MIN_ANGLE = 0;
 constexpr int PAN_PERIOD = 10;
 constexpr int TILT_PERIOD = 30;
 
-PanTiltKit::PanTiltKit() {
+PanTiltKit::PanTiltKit() : is_initialized(true) {
     panServo = std::make_unique<Microservo>(PAN_FILE_PATH, PAN_PERIOD, PAN_MIN_ANGLE, PAN_MAX_ANGLE);
     tiltServo = std::make_unique<Microservo>(TILT_FILE_PATH, TILT_PERIOD, TILT_MIN_ANGLE, TILT_MAX_ANGLE);
 }
 
 PanTiltKit::~PanTiltKit() {
+    assert(is_initialized);
+    is_initialized = false;
     std::printf("PanTiltKit module shutdown.\n");
 }
 

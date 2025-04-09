@@ -36,7 +36,7 @@ void BroadcastServer::onClose(const websocketpp::connection_hdl& hdl) {
 }
 
 void BroadcastServer::run(const uint16_t& port) {
-    while(isRunning.load()) {
+    while(isRunning) {
         wsServer.listen(port);
         wsServer.start_accept();
         wsServer.run();

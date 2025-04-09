@@ -17,6 +17,8 @@ public:
     void decreaseTiltAngle(int angle = ANGLE_STEP);
 
 private:
+    bool is_initialized;
+
     std::unique_ptr<Microservo> panServo;
     std::unique_ptr<Microservo> tiltServo;
 };

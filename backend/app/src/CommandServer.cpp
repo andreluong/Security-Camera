@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string_view>
 #include <unordered_map>
+#include "personDetector.h"
 
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
@@ -49,7 +50,7 @@ void CommandServer::onMessage(const websocketpp::connection_hdl& hdl, const serv
         {"right", [this] { panTiltKit.decreasePanAngle(); }},
         {"up", [this] { panTiltKit.increaseTiltAngle(); }},
         {"down", [this] { panTiltKit.decreaseTiltAngle(); }},
-        {"alarm", [this] { alarm.alert();  }},
+        {"alarm", [this] { alarm.playAlarm();  }},
         {"stop", [this, &hdl] { terminate(hdl); }}
     };
 
@@ -66,7 +67,7 @@ void CommandServer::onMessage(const websocketpp::connection_hdl& hdl, const serv
 }
 
 void CommandServer::run(const uint16_t& port) {
-    while(isRunning.load()) {
+    while(isRunning) {
         wsServer.listen(port);
         wsServer.start_accept();
         wsServer.run();
@@ -74,6 +75,8 @@ void CommandServer::run(const uint16_t& port) {
     std::cout << "Command server stopped" << std::endl;
 }
 
+// TODO: Only disconnects client. Should close terminate program
+// [2025-03-29 02:02:03] [disconnect] Disconnect close local:[1000,client exit] remote:[1000,client exit]
 void CommandServer::terminate(const websocketpp::connection_hdl& hdl) {
     wsServer.close(hdl, websocketpp::close::status::normal, "client exit");
 }
