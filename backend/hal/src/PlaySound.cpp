@@ -17,6 +17,9 @@
 #define MAX_SOUND_BITES 100
 #define AUDIOMIXER_MAX_VOLUME 100
 
+std::thread Audio::playbackThread;   // Define static thread
+std::atomic<bool> Audio::stopping(false);  // Define static atomic variable
+
 // Internal AudioMixer state
 namespace {
     struct playbackSound_t {
@@ -27,8 +30,6 @@ namespace {
     snd_pcm_t* handle = nullptr;
     short* playbackBuffer = nullptr;
     unsigned long playbackBufferSize = 0;
-    pthread_t playbackThreadId;
-    std::atomic<bool> stopping = false;
     std::mutex audioMutex;
     int volume = 80;
     playbackSound_t soundBites[MAX_SOUND_BITES];
@@ -64,32 +65,33 @@ void Audio::init() {
     unsigned long unusedBufferSize = 0;
     snd_pcm_get_params(handle, &unusedBufferSize, &playbackBufferSize);
     playbackBuffer = new short[playbackBufferSize];
-
-    pthread_create(&playbackThreadId, nullptr, [](void*) -> void* {
+    playbackThread = std::thread([]() {
         while (!stopping) {
             Audio::fillPlaybackBuffer(playbackBuffer, playbackBufferSize);
             snd_pcm_sframes_t frames = snd_pcm_writei(handle, playbackBuffer, playbackBufferSize);
+            
             if (frames < 0) {
                 frames = snd_pcm_recover(handle, frames, 1);
             }
+            
             if (frames < 0) {
                 std::cerr << "ERROR: Failed writing audio." << std::endl;
                 exit(EXIT_FAILURE);
             }
         }
-        return nullptr;
-    }, nullptr);
+        std::cout << "playback thread stopped" << std::endl;
+    });
 }
+
 
 void Audio::cleanup() {
     std::cout << "Stopping audio...\n";
     stopping = true;
-    pthread_join(playbackThreadId, nullptr);
-    snd_pcm_drain(handle);
-    snd_pcm_close(handle);
+    if(playbackThread.joinable()) playbackThread.join();
     delete[] playbackBuffer;
     playbackBuffer = nullptr;
-    std::cout << "Done stopping audio...\n";
+    snd_pcm_drain(handle);
+    snd_pcm_close(handle);
 }
 
 void Audio::readWaveFileIntoMemory(const char* fileName, wavedata_t* sound) {
@@ -199,19 +201,21 @@ void Audio::fillPlaybackBuffer(short* buff, int size) {
     }
 }
 
-Sound::Sound() {
+Alarm::Alarm(const char* SoundPath) {
     // const char* SoundPath = "/mnt/remote/myApps/beatbox-wave-files/267560__alienxxx__beep_sequence_01.wav";
-    const char* SoundPath = "sounds/alarm_guillaume.wav";
+    const char* soundFile = SoundPath;
     Audio::init();
-    Audio::readWaveFileIntoMemory(SoundPath, &sound);
+    Audio::readWaveFileIntoMemory(soundFile, &sound);
 }
 
-Sound::~Sound() {
+Alarm::~Alarm() {
     Audio::freeWaveFileData(&sound);
     Audio::cleanup();
+
+    std::cout << "Tidied up sound...\n";
 }
 
-void Sound::playSound() {
+void Alarm::playAlarm() {
     Audio::queueSound(&sound);
     std::cout << "Sound played!" << std::endl;
 }

@@ -52,7 +52,7 @@ private:
     int i2c_file_desc;
     PanTiltKit& panTiltKit;
     GpioLine joystickLine;
-    Sound alarm;
+    Alarm alarm;
     std::vector<State> states;
     State* currentState = nullptr;
 

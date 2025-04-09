@@ -2,6 +2,8 @@
 #define PLAYSOUND_H
 
 #include <cstddef>  // for size_t
+#include <thread>
+#include <atomic>
 
 // Structure for holding WAV audio data
 struct wavedata_t {
@@ -20,14 +22,17 @@ public:
     static void fillPlaybackBuffer(short* buff, int size);
     static void setVolume(int newVolume);
     static int getVolume();
+private:
+    static std::thread playbackThread;
+    static std::atomic<bool> stopping;
 };
 
-// BeatBox class for managing and playing a single snare sound
-class Sound {
+
+class Alarm {
 public:
-    Sound();            // Loads snare audio on construction
-    ~Sound();           // Frees snare memory on destruction
-    void playSound();     // Queue snare sound for playback
+    Alarm(const char* SoundPath = "sounds/alarm_guillaume.wav");            
+    ~Alarm();           
+    void playAlarm();     
 
 private:
     wavedata_t sound;
