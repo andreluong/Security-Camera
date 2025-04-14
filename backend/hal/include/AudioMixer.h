@@ -40,14 +40,14 @@ public:
     int getVolume();
 
 private:
-    static constexpr int DEFAULT_VOLUME = 80;
+    static constexpr int DEFAULT_VOLUME = 400;
     static constexpr int MAX_SOUND_BITES = 1; // Limited to 1
     static constexpr int NUM_CHANNELS = 1;
     static constexpr int SAMPLE_RATE = 44100;
     static constexpr int FILL_BUFFER_WAIT = 17;
     static constexpr size_t SAMPLE_SIZE = sizeof(short);
     static constexpr int MIN_VOLUME = 0;
-    static constexpr int MAX_VOLUME = 100;
+    static constexpr int MAX_VOLUME = 500;
 
     std::atomic<bool> isRunning;
     std::atomic<int> volume;

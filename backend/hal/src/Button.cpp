@@ -11,7 +11,7 @@ Button::Button(GpioLine line) : isRunning(true), pressed(false), btnLine(line) {
     states.push_back(one);
     states.push_back(two);
     currentState = &states[0];
-    buttonThread = std::thread(&Button::doNothing, this);
+    buttonThread = std::thread(&Button::processButton, this);
     printf("reached end\n");
 }
 
@@ -19,10 +19,6 @@ Button::~Button() {
     isRunning = false;
     pthread_cancel(buttonThread.native_handle()); // Must be cancelled due to hanging
     if (buttonThread.joinable()) buttonThread.join();
-}
-
-void Button::doNothing() {
-    return;
 }
 
 void Button::onRelease() {

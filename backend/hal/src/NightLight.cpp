@@ -25,7 +25,7 @@ void NightLight::processLight() {
 
         if (value <= 400) {
             markLEDs(WHITE_BRIGHT, pR5Base);
-        } else if (value <= 600) {
+        } else if (value <= 800) {
             markLEDs(WHITE_RGB, pR5Base);
         } else {
             markLEDs(BLACK, pR5Base);
